@@ -1,0 +1,13 @@
+dataset:
+  name: openarm_success_filtered_4000
+  output_dir: synthetic_smolvla/datasets/openarm_success_filtered_4000
+  manifest: synthetic_smolvla/reports/oracle_parallel_success.jsonl
+  source_manifest: synthetic_smolvla/reports/oracle_parallel_all.jsonl
+  total_requested_episodes: 4000
+  repo_id: local/openarm_success_filtered_4000
+  image_size: 96
+  fps: 10
+  filter:
+    require_success_label: true
+    reject_wrong_object_lifted: true
+    reject_limit_exceeded: false

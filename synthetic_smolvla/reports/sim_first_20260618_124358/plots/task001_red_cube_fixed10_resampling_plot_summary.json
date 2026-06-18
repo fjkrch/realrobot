@@ -1,0 +1,18 @@
+{
+  "average_samples_per_vla_command": 10.0,
+  "max_raw_8d_delta_deg": 120.281196,
+  "max_raw_arm_delta_deg": 120.281196,
+  "max_resampled_8d_delta_deg": 12.02812,
+  "max_resampled_arm_delta_deg": 12.02812,
+  "plots": {
+    "right_all_8d_pdf": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/sim_first_20260618_124358/plots/task001_red_cube_fixed10_right_all_8d.pdf",
+    "right_all_8d_png": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/sim_first_20260618_124358/plots/task001_red_cube_fixed10_right_all_8d.png",
+    "right_arm_joints_pdf": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/sim_first_20260618_124358/plots/task001_red_cube_fixed10_right_arm_joints.pdf",
+    "right_arm_joints_png": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/sim_first_20260618_124358/plots/task001_red_cube_fixed10_right_arm_joints.png"
+  },
+  "raw": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/sim_first_20260618_124358/trajectories/task001_red_cube_commands.jsonl",
+  "raw_records": 50,
+  "resampled": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/sim_first_20260618_124358/trajectories/task001_red_cube_commands_fixed10_arm_gripper.jsonl",
+  "resampled_records": 500,
+  "side": "right"
+}

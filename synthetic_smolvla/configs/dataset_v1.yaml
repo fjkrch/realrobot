@@ -1,0 +1,20 @@
+dataset:
+  name: openarm_synth_v1
+  output_dir: synthetic_smolvla/datasets/openarm_synth_v1
+  manifest: synthetic_smolvla/datasets/openarm_synth_v1/oracle_manifest.jsonl
+  total_episodes: 1000
+  seed: 1101
+  randomized: false
+  all_objects_visible_ratio: 1.0
+  episodes_per_object:
+    orange_ball: 250
+    red_cube: 250
+    green_cube: 250
+    blue_cube: 250
+  capture:
+    rgb: true
+    joint_state: true
+    action: true
+    language: true
+    success_label: true
+

@@ -1,2 +1,4 @@
-OPENARM_ROBOT_HANDOFF.md
+**/OPENARM_ROBOT_HANDOFF.md
 *.private.md
+logs/
+__pycache__/

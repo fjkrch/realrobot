@@ -1,0 +1,88 @@
+{
+  "checkpoint_dir": {
+    "exists": false,
+    "path": "/tmp/smolvla_openarm_success_filtered_14000_smoke",
+    "usable_for_new_run": true
+  },
+  "command": [
+    "/home/chyanin/miniconda3/envs/env_isaaclab/bin/python",
+    "-m",
+    "lerobot.scripts.lerobot_train",
+    "--dataset.repo_id",
+    "local/openarm_success_filtered_14000",
+    "--dataset.root",
+    "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_success_filtered_14000",
+    "--policy.type",
+    "smolvla",
+    "--policy.device",
+    "cuda",
+    "--policy.push_to_hub",
+    "false",
+    "--policy.repo_id",
+    "local/smolvla_openarm_success_filtered_14000_smoke",
+    "--output_dir",
+    "/tmp/smolvla_openarm_success_filtered_14000_smoke",
+    "--batch_size",
+    "1",
+    "--steps",
+    "1",
+    "--save_freq",
+    "1",
+    "--log_freq",
+    "10",
+    "--num_workers",
+    "0",
+    "--wandb.enable",
+    "false"
+  ],
+  "command_output": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/train_success_filtered_14000_smoke.sh",
+  "dataset": {
+    "exists": true,
+    "missing": [],
+    "ready": true,
+    "root": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_success_filtered_14000"
+  },
+  "modules": {
+    "lerobot": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/lerobot/__init__.py"
+    },
+    "lerobot_dataset": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/lerobot/datasets/lerobot_dataset.py"
+    },
+    "lerobot_train": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/lerobot/scripts/lerobot_train.py"
+    },
+    "smolvla_policy": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/lerobot/policies/smolvla/modeling_smolvla.py"
+    },
+    "torch": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/torch/__init__.py"
+    },
+    "transformers": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/transformers/__init__.py"
+    }
+  },
+  "run": {
+    "duration_sec": 31.26573657989502,
+    "returncode": 0,
+    "stderr_tail": "           'freeze_vision_encoder': True,\n            'input_features': {},\n            'license': None,\n            'load_vlm_weights': False,\n            'max_action_dim': 32,\n            'max_period': 4.0,\n            'max_state_dim': 32,\n            'min_period': 0.004,\n            'n_action_steps': 50,\n            'n_obs_steps': 1,\n            'normalization_mapping': {'ACTION': <NormalizationMode.MEAN_STD: 'MEAN_STD'>,\n                                      'STATE': <NormalizationMode.MEAN_STD: 'MEAN_STD'>,\n                                      'VISUAL': <NormalizationMode.IDENTITY: 'IDENTITY'>},\n            'num_expert_layers': -1,\n            'num_steps': 10,\n            'num_vlm_layers': 16,\n            'optimizer_betas': [0.9, 0.95],\n            'optimizer_eps': 1e-08,\n            'optimizer_grad_clip_norm': 10,\n            'optimizer_lr': 0.0001,\n            'optimizer_weight_decay': 1e-10,\n            'output_features': {},\n            'pad_language_to': 'longest',\n            'prefix_length': -1,\n            'pretrained_path': None,\n            'private': None,\n            'push_to_hub': False,\n            'repo_id': 'local/smolvla_openarm_success_filtered_14000_smoke',\n            'resize_imgs_with_padding': [512, 512],\n            'rtc_config': None,\n            'scheduler_decay_lr': 2.5e-06,\n            'scheduler_decay_steps': 30000,\n            'scheduler_warmup_steps': 1000,\n            'self_attn_every_n_layers': 2,\n            'tags': None,\n            'tokenizer_max_length': 48,\n            'train_expert_only': True,\n            'train_state_proj': True,\n            'type': 'smolvla',\n            'use_amp': False,\n            'use_cache': True,\n            'use_delta_joint_actions_aloha': False,\n            'use_peft': False,\n            'vlm_model_name': 'HuggingFaceTB/SmolVLM2-500M-Video-Instruct'},\n 'rabc_epsilon': 1e-06,\n 'rabc_head_mode': 'sparse',\n 'rabc_kappa': 0.01,\n 'rabc_progress_path': None,\n 'rename_map': {},\n 'resume': False,\n 'save_checkpoint': True,\n 'save_freq': 1,\n 'scheduler': {'decay_lr': 2.5e-06,\n               'num_decay_steps': 30000,\n               'num_warmup_steps': 1000,\n               'peak_lr': 0.0001,\n               'type': 'cosine_decay_with_warmup'},\n 'seed': 1000,\n 'steps': 1,\n 'tolerance_s': 0.0001,\n 'use_policy_training_preset': True,\n 'use_rabc': False,\n 'wandb': {'disable_artifact': False,\n           'enable': False,\n           'entity': None,\n           'mode': None,\n           'notes': None,\n           'project': 'lerobot',\n           'run_id': None}}\nINFO 2026-06-17 09:14:27 ot_train.py:205 Logs will be saved locally.\nINFO 2026-06-17 09:14:27 ot_train.py:217 Creating dataset\nINFO 2026-06-17 09:14:27 eo_utils.py:106 Using video codec: libsvtav1\nINFO 2026-06-17 09:14:27 ot_train.py:235 Creating policy\nINFO 2026-06-17 09:14:51 ot_train.py:290 Creating optimizer and scheduler\nINFO 2026-06-17 09:14:51 hedulers.py:105 Auto-scaling LR scheduler: num_training_steps (1) < num_decay_steps (30000). Scaling warmup: 1000 \u2192 0, decay: 30000 \u2192 1 (scale factor: 0.000)\nINFO 2026-06-17 09:14:51 ot_train.py:325 Output dir: /tmp/smolvla_openarm_success_filtered_14000_smoke\nINFO 2026-06-17 09:14:51 ot_train.py:332 cfg.steps=1 (1)\nINFO 2026-06-17 09:14:51 ot_train.py:333 dataset.num_frames=31400 (31K)\nINFO 2026-06-17 09:14:51 ot_train.py:334 dataset.num_episodes=6280\nINFO 2026-06-17 09:14:51 ot_train.py:337 Effective batch size: 1 x 1 = 1\nINFO 2026-06-17 09:14:51 ot_train.py:338 num_learnable_params=99880992 (100M)\nINFO 2026-06-17 09:14:51 ot_train.py:339 num_total_params=450046176 (450M)\n\nTraining:   0%|          | 0/1 [00:00<?, ?step/s]INFO 2026-06-17 09:14:51 ot_train.py:403 Start offline training on a fixed dataset, with effective batch size: 1\n\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00,  1.51step/s]INFO 2026-06-17 09:14:51 ot_train.py:455 Checkpoint policy after step 1\n\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:02<00:00,  2.41s/step]\nINFO 2026-06-17 09:14:53 ot_train.py:529 End of training\n",
+    "stdout_tail": "Reducing the number of VLM layers to 16 ...\n"
+  },
+  "shell_command": "/home/chyanin/miniconda3/envs/env_isaaclab/bin/python -m lerobot.scripts.lerobot_train --dataset.repo_id local/openarm_success_filtered_14000 --dataset.root /home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_success_filtered_14000 --policy.type smolvla --policy.device cuda --policy.push_to_hub false --policy.repo_id local/smolvla_openarm_success_filtered_14000_smoke --output_dir /tmp/smolvla_openarm_success_filtered_14000_smoke --batch_size 1 --steps 1 --save_freq 1 --log_freq 10 --num_workers 0 --wandb.enable false",
+  "status": "completed",
+  "training_config": {
+    "batch_size": 4,
+    "checkpoint_dir": "/tmp/smolvla_openarm_success_filtered_14000_smoke",
+    "dataset": "synthetic_smolvla/datasets/openarm_success_filtered_14000",
+    "device": "cuda",
+    "policy": "smolvla",
+    "run_mode": "preflight_only",
+    "steps": 10000
+  }
+}

@@ -1,0 +1,8 @@
+training:
+  dataset: synthetic_smolvla/datasets/openarm_success_filtered_14000
+  checkpoint_dir: synthetic_smolvla/checkpoints/smolvla_openarm_success_filtered_14000
+  policy: smolvla
+  device: cuda
+  batch_size: 4
+  steps: 10000
+  run_mode: preflight_only

@@ -1,0 +1,85 @@
+[3gH    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H  [INFO] Using python from: /home/chyanin/miniconda3/envs/env_isaaclab/bin/python
+[interactive-vla] simulation only; no real robot commands are used.
+[interactive-vla] dry-run mirror trace: /home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/sim_first_20260618_124000/dry_run_trace.jsonl
+[interactive-vla] using checkpoint /home/chyanin/Desktop/realrobot/synthetic_smolvla/checkpoints/smolvla_openarm_dense_isaac_camera_v1/checkpoints/015000/pretrained_model_typed
+[interactive-vla] launching Isaac (headless=False)
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /home/chyanin/IsaacLab/apps/isaaclab.python.rendering.kit
+Loading user config located at: '/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260618_124000.log
+2026-06-18T05:40:00Z [16ms] [Warning] [omni.ext.plugin] [ext: hsi_pregrasp_refusal] Extensions config 'extension.toml' doesn't exist '/home/chyanin/IsaacLab/source/hsi_pregrasp_refusal' or '/home/chyanin/IsaacLab/source/hsi_pregrasp_refusal/config'
+2026-06-18T05:40:02Z [1,123ms] [Warning] [gpu.foundation.plugin] Skipping unsupported non-NVIDIA GPU: AMD Radeon 780M Graphics (RADV PHOENIX)
+2026-06-18T05:40:02Z [1,123ms] [Warning] [gpu.foundation.plugin] Skipping unsupported non-NVIDIA GPU: AMD Radeon 780M Graphics (RADV PHOENIX)
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.159.03    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 4060 Laptop.. | Yes: 0 |     | 8188    MB | 10de      | 0          |
+|     |                                  |        |     |            | 28e0      | 78564eae.. |
+|     |                                  |        |     |            | 1         |            |
+|---------------------------------------------------------------------------------------------|
+| 1   | AMD Radeon 780M Graphics (RADV.. |        |     | 5396    MB | 1002      | 0          |
+|     |                                  |        |     |            | 15bf      | 00000000.. |
+|     |                                  |        |     |            | 6         |            |
+|=============================================================================================|
+| OS: 24.04.3 LTS (Noble Numbat) ubuntu, Version: 24.04.3, Kernel: 6.17.0-35-generic
+| XServer Vendor: The X.Org Foundation, XServer Version: 12101011 (1.21.1.11)
+| Processor: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+| Cores: 8 | Logical Cores: 16
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 15165 | Free Memory: 10679
+| Total Page/Swap (MB): 4095 | Free Page/Swap: 2777
+|---------------------------------------------------------------------------------------------|
+2026-06-18T05:40:02Z [1,468ms] [Warning] [gpu.foundation.plugin] CPU performance profile is set to powersave. This profile sets the CPU to the lowest frequency reducing performance.
+2026-06-18T05:40:02Z [1,479ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2026-06-18T05:40:02Z [1,479ms] [Warning] [gpu.foundation.plugin] Detected IOMMU is enabled. Running CUDA peer-to-peer bandwidth and latency validation.
+Unidirectional P2P=Enabled Bandwidth (P2P Writes) Matrix (GB/s)
+   D\D     0 
+     0 198.64 
+P2P=Enabled Latency (P2P Writes) Matrix (us)
+   GPU     0 
+     0   1.61 
+
+   CPU     0 
+     0   2.61 
+2026-06-18T05:40:03Z [2,577ms] [Warning] [omni.log] Source: omni.hydra was already registered.
+2026-06-18T05:40:04Z [3,138ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-06-18T05:40:04Z [3,153ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+2026-06-18T05:40:05Z [4,848ms] [Warning] [pxr.Semantics] pxr.Semantics is deprecated - please use Semantics instead
+2026-06-18T05:40:06Z [5,258ms] [Warning] [omni.graph.core.plugin] Found duplicate of category 'Replicator' - was 'Annotators', adding 'Fabric Reader'
+2026-06-18T05:40:06Z [5,258ms] [Warning] [omni.graph.core.plugin] Category 'Replicator' not accepted on node type 'omni.replicator.core.FabricReader' in extension 'omni.replicator.core'
+2026-06-18T05:40:06Z [5,259ms] [Warning] [omni.replicator.core.scripts.extension] No material configuration file, adding configuration to material settings directly.
+2026-06-18T05:40:07Z [7,057ms] [Warning] [omni.fabric.plugin] Warning: attribute viewportHandle not found for bucket id 9
+
+[interactive-vla] loading policy
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+`torch_dtype` is deprecated! Use `dtype` instead!
+Reducing the number of VLM layers to 16 ...
+Loading weights from local directory
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-06-18_12-40-30.log[0m
+[36m======================================================================================[0m
+
+[33m12:40:30 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[33m12:40:35 [articulation.py] WARNING: Not all actuators are configured! Total number of actuated joints not equal to number of joints available: 18 != 22.[0m
+2026-06-18T05:40:35Z [34,185ms] [Warning] [omni.fabric.plugin] USD->Fabric: Unhandled array type string[]
+2026-06-18T05:40:35Z [34,189ms] [Warning] [usdrt.population.plugin] [UsdNoticeHandler] Unhandled attribute type VtArray<std::string> (prim attribute: omni:rtx:material:db:flattener:ior_constant)
+2026-06-18T05:40:35Z [34,189ms] [Warning] [usdrt.population.plugin] [UsdNoticeHandler] Unhandled attribute type VtArray<std::string> (prim attribute: omni:rtx:material:db:flattener:reflection_roughness_constant)
+2026-06-18T05:40:35Z [34,189ms] [Warning] [usdrt.population.plugin] [UsdNoticeHandler] Unhandled attribute type VtArray<std::string> (prim attribute: omni:rtx:material:db:flattener:transmittance_color)
+2026-06-18T05:40:35Z [34,327ms] [Warning] [omni.fabric.plugin] getAttributeCount called on non-existent path /World/envs/env_0/Robot/openarm_right_right_finger/collisions/openarm_right_right_finger_collision
+2026-06-18T05:40:35Z [34,327ms] [Warning] [omni.fabric.plugin] getTypes called on non-existent path /World/envs/env_0/Robot/openarm_right_right_finger/collisions/openarm_right_right_finger_collision
+2026-06-18T05:40:36Z [35,182ms] [Warning] [rtx.postprocessing.plugin] DLSS increasing input dimensions: Render resolution of (148, 148) is below minimal input resolution of 300.
+[interactive-vla] Isaac render interval: every 1 physics step(s) (final step of each command always renders)
+
+[interactive-vla] reset to random object poses:
+  orange_ball: [+0.286, -0.264, +0.550] m
+  red_cube: [+0.294, -0.206, +0.550] m
+  green_cube: [+0.308, -0.139, +0.550] m
+  blue_cube: [+0.300, -0.073, +0.550] m
+
+Type task (orange/red/green/blue, reset, hold, or q to release): 

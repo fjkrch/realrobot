@@ -1,0 +1,58 @@
+# Canonical spec for the corrected dense Isaac-camera SmolVLA dataset (v1).
+#
+# This dataset replaces the weak openarm_success_filtered_14000 baseline (5 sparse
+# keyframes, static placeholder images, 99% limit-clamped). It is produced by
+# scripts/collect_dense_isaac_dataset.py, which writes the LeRobot dataset and the
+# episode-metadata JSONL directly from Isaac physics. The fields below mirror the
+# exact CLI used for the full run so the dataset can be regenerated.
+dataset:
+  name: openarm_dense_isaac_camera_v1
+  output_dir: synthetic_smolvla/datasets/openarm_dense_isaac_camera_v1
+  repo_id: local/openarm_dense_isaac_camera_v1
+  manifest: synthetic_smolvla/reports/dense_isaac_camera_v1_manifest.jsonl
+  report: synthetic_smolvla/reports/dense_isaac_camera_v1_dataset.md
+  scene_config: synthetic_smolvla/configs/scene_openarm_dense_isaac_camera_v1.yaml
+  image_size: 256          # square real Isaac camera frame (from scene camera.resolution)
+  fps: 10
+
+collection:
+  # num_envs * rounds = source episodes. Measured keep rate ~48% (target lift, no
+  # wrong-object). 16 envs fits the 8 GB GPU with cameras (proven); ~16 s/round.
+  # orange_ball is mildly over-sampled (weight 1.6); with its improved ~45% grasp
+  # rate this lands a balanced kept distribution instead of the old 610-vs-2222.
+  num_envs: 16
+  rounds: 130             # 2080 source episodes -> ~1000 kept dense episodes
+  seed: 12000
+  randomize: true
+  target_weights: "1.6,1,1,1"   # [orange_ball, red_cube, green_cube, blue_cube]
+  drop_limit_exceeded: false     # the IK rides the safety clamp on ~100% of picks
+                                 # in this pocket; dropping it would discard nearly
+                                 # everything (the clamp is a safety flag, not the
+                                 # grasp bottleneck per README "Optimization attempts")
+  device: cuda:0
+
+# Dense control schedule (control steps per phase). Sum = episode length = 50,
+# matched to the SmolVLA chunk_size used in train_dense_isaac_camera_v1.yaml.
+control_schedule:
+  approach_steps: 14
+  descend_steps: 12
+  close_steps: 8
+  lift_steps: 12
+  hold_steps: 4
+  substeps: 12             # physics steps per control step; matches eval_vla_isaac.py
+  settle_steps: 40
+  above_offset_m: 0.12
+  lift_offset_m: 0.15
+  lift_threshold_m: 0.04
+  grasp_close_deg: 0.0     # full close; 1-inch cube held by friction
+
+features:
+  observation.images.camera1: { dtype: image, shape: [256, 256, 3] }   # real Isaac camera
+  observation.state: { dtype: float32, shape: [8] }   # measured 7 arm + gripper (deg)
+  action: { dtype: float32, shape: [8] }              # commanded clamped IK target (deg)
+
+notes:
+  - "observation.state is the MEASURED joint state; action is the COMMANDED clamped IK target."
+  - "Frames are the real Isaac scene camera, captured per control step (not static, not placeholder)."
+  - "Only successful, correct-object lifts are kept; wrong-object lifts are rejected."
+  - "Cubes are 1 inch (0.0254 m) per side, per the v1 request."

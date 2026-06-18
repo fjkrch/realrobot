@@ -1,0 +1,12 @@
+*
+!.gitignore
+!openarm_synth_v1/
+!openarm_synth_v1/.gitkeep
+!openarm_synth_v2/
+!openarm_synth_v2/.gitkeep
+!openarm_success_filtered_4000/
+!openarm_success_filtered_4000/.gitkeep
+!openarm_success_filtered_extra10000/
+!openarm_success_filtered_extra10000/.gitkeep
+!openarm_success_filtered_14000/
+!openarm_success_filtered_14000/.gitkeep

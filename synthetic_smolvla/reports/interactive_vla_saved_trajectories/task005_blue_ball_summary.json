@@ -1,0 +1,39 @@
+{
+  "limit_clamp_events": 0,
+  "object_poses_m": {
+    "blue_cube": [
+      0.30325,
+      -0.07905,
+      0.55
+    ],
+    "green_cube": [
+      0.30383,
+      -0.13806,
+      0.55
+    ],
+    "orange_ball": [
+      0.30373,
+      -0.26344,
+      0.55
+    ],
+    "red_cube": [
+      0.30845,
+      -0.20347,
+      0.55
+    ]
+  },
+  "object_rises_m": {
+    "blue_cube": 0.0,
+    "green_cube": 0.0,
+    "orange_ball": 0.0,
+    "red_cube": -0.0
+  },
+  "real_replay_status": "not_requested",
+  "success": null,
+  "target": null,
+  "target_rise_m": null,
+  "task_index": 5,
+  "trajectory_jsonl": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/interactive_vla_saved_trajectories/task005_blue_ball_commands.jsonl",
+  "trajectory_summary": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/interactive_vla_saved_trajectories/task005_blue_ball_summary.json",
+  "wrong_object_lifted": null
+}

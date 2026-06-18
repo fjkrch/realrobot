@@ -1,0 +1,85 @@
+{
+  "clamp_events": 0,
+  "delta_check_includes_gripper": true,
+  "errors": [],
+  "expected_steps": null,
+  "first_target_delta_from_start_deg": 1.005852,
+  "first_target_tolerance_deg": 15.0,
+  "gripper_sent_to_real": true,
+  "max_allowed_arm_delta_deg": 13.0,
+  "max_allowed_checked_delta_deg": 13.0,
+  "max_observed_arm_delta_deg": 12.02812,
+  "max_observed_checked_delta_deg": 12.02812,
+  "ok": true,
+  "real_gripper_disabled": false,
+  "records": 500,
+  "side": "right",
+  "trajectory": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/sim_first_20260618_124358/trajectories/task001_red_cube_commands_fixed10_arm_gripper.jsonl",
+  "zero_then_start": {
+    "configured_start_pose": {
+      "arm_command_deg": {
+        "joint_1": 0.0,
+        "joint_2": 20.0,
+        "joint_3": 0.0,
+        "joint_4": 55.0,
+        "joint_5": 0.0,
+        "joint_6": 15.0,
+        "joint_7": 0.0
+      },
+      "command_deg": [
+        0.0,
+        20.0,
+        0.0,
+        55.0,
+        0.0,
+        15.0,
+        0.0,
+        -65.0
+      ],
+      "gripper_command_deg": -65.0,
+      "label": "configured_start_pose"
+    },
+    "zero_pose": {
+      "arm_command_deg": {
+        "joint_1": 0.0,
+        "joint_2": 0.0,
+        "joint_3": 0.0,
+        "joint_4": 2.0,
+        "joint_5": 0.0,
+        "joint_6": 0.0,
+        "joint_7": 0.0
+      },
+      "command_deg": [
+        0.0,
+        0.0,
+        0.0,
+        2.0,
+        0.0,
+        0.0,
+        0.0,
+        -65.0
+      ],
+      "gripper_command_deg": -65.0,
+      "label": "zero_arm_staging_pose"
+    },
+    "zero_stage_sec": 8.0
+  }
+}
+[zero-start-replay] real helper ready.
+{
+  "real_gripper_disabled": false,
+  "real_side": "right",
+  "real_state_deg": [
+    -1.12563,
+    -0.84149,
+    -0.09836,
+    0.25135,
+    0.14207,
+    -4.07632,
+    -2.43705,
+    -64.77304
+  ]
+}
+[zero-start-replay] sending zero staging pose; not waiting for stable zero.
+[zero-start-replay] moving to configured sim init pose.
+[zero-start-replay] safety abort: Timed out waiting for real helper response.

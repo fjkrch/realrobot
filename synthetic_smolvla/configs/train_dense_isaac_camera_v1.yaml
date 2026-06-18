@@ -1,0 +1,22 @@
+training:
+  dataset: synthetic_smolvla/datasets/openarm_dense_isaac_camera_v1
+  checkpoint_dir: synthetic_smolvla/checkpoints/smolvla_openarm_dense_isaac_camera_v1
+  policy: smolvla
+  # Finetune from the pretrained SmolVLA base (loads the pretrained VLM AND the
+  # action expert). The old 14000 run used neither --policy.path nor
+  # load_vlm_weights, so it trained a 500M VLM from scratch on 30k frames — a very
+  # likely reason it reached low loss but 0 Isaac lifts. Finetuning is the
+  # recommended SmolVLA recipe and the strongest single lever here.
+  policy_path: lerobot/smolvla_base
+  device: cuda
+  batch_size: 1            # keep at 1 on the 8 GB RTX 4060 (per training handoff)
+  steps: 20000
+  save_freq: 5000         # intermediate checkpoints survive a crash
+  # Horizon matched to the dense 50-step episode. chunk_size stays at the base
+  # value (50) because we finetune; one chunk now spans a whole real episode
+  # (vs the old 5-frame episodes where chunk_size=50 was 90% padding).
+  # n_action_steps=10 makes eval re-observe every 10 control steps (closed loop)
+  # instead of the old open-loop 50.
+  chunk_size: 50
+  n_action_steps: 10
+  run_mode: preflight_only

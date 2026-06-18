@@ -1,0 +1,82 @@
+{
+  "checkpoint_dir": {
+    "exists": false,
+    "path": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/checkpoints/smolvla_openarm_success_filtered",
+    "usable_for_new_run": true
+  },
+  "command": [
+    "/home/chyanin/miniconda3/envs/env_isaaclab/bin/python",
+    "-m",
+    "lerobot.scripts.lerobot_train",
+    "--dataset.repo_id",
+    "local/openarm_success_filtered_4000",
+    "--dataset.root",
+    "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_success_filtered_4000",
+    "--policy.type",
+    "smolvla",
+    "--policy.device",
+    "cuda",
+    "--policy.push_to_hub",
+    "false",
+    "--policy.repo_id",
+    "local/smolvla_openarm_success_filtered",
+    "--output_dir",
+    "/home/chyanin/Desktop/realrobot/synthetic_smolvla/checkpoints/smolvla_openarm_success_filtered",
+    "--batch_size",
+    "4",
+    "--steps",
+    "10000",
+    "--save_freq",
+    "10000",
+    "--log_freq",
+    "10",
+    "--num_workers",
+    "0",
+    "--wandb.enable",
+    "false"
+  ],
+  "command_output": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/train_success_filtered.sh",
+  "dataset": {
+    "exists": true,
+    "missing": [],
+    "ready": true,
+    "root": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_success_filtered_4000"
+  },
+  "modules": {
+    "lerobot": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/lerobot/__init__.py"
+    },
+    "lerobot_dataset": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/lerobot/datasets/lerobot_dataset.py"
+    },
+    "lerobot_train": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/lerobot/scripts/lerobot_train.py"
+    },
+    "smolvla_policy": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/lerobot/policies/smolvla/modeling_smolvla.py"
+    },
+    "torch": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/torch/__init__.py"
+    },
+    "transformers": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/transformers/__init__.py"
+    }
+  },
+  "shell_command": "/home/chyanin/miniconda3/envs/env_isaaclab/bin/python -m lerobot.scripts.lerobot_train --dataset.repo_id local/openarm_success_filtered_4000 --dataset.root /home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_success_filtered_4000 --policy.type smolvla --policy.device cuda --policy.push_to_hub false --policy.repo_id local/smolvla_openarm_success_filtered --output_dir /home/chyanin/Desktop/realrobot/synthetic_smolvla/checkpoints/smolvla_openarm_success_filtered --batch_size 4 --steps 10000 --save_freq 10000 --log_freq 10 --num_workers 0 --wandb.enable false",
+  "status": "prepared",
+  "training_config": {
+    "batch_size": 4,
+    "checkpoint_dir": "synthetic_smolvla/checkpoints/smolvla_openarm_success_filtered",
+    "dataset": "synthetic_smolvla/datasets/openarm_success_filtered_4000",
+    "device": "cuda",
+    "policy": "smolvla",
+    "run_mode": "preflight_only",
+    "steps": 10000
+  }
+}

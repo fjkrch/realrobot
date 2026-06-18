@@ -1,0 +1,13 @@
+dataset:
+  name: openarm_success_filtered_extra10000
+  output_dir: synthetic_smolvla/datasets/openarm_success_filtered_extra10000
+  manifest: synthetic_smolvla/reports/oracle_parallel_extra10000_success.jsonl
+  source_manifest: synthetic_smolvla/reports/oracle_parallel_extra10000_all.jsonl
+  total_requested_episodes: 10000
+  repo_id: local/openarm_success_filtered_extra10000
+  image_size: 96
+  fps: 10
+  filter:
+    require_success_label: true
+    reject_wrong_object_lifted: true
+    reject_limit_exceeded: false

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+set -euo pipefail
+/home/chyanin/miniconda3/envs/env_isaaclab/bin/python -m lerobot.scripts.lerobot_train --dataset.repo_id local/openarm_success_filtered_4000 --dataset.root /home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_success_filtered_4000 --policy.type smolvla --policy.device cuda --policy.push_to_hub false --policy.repo_id local/smolvla_openarm_success_filtered_smoke --output_dir /tmp/smolvla_openarm_success_filtered_smoke --batch_size 1 --steps 1 --save_freq 1 --log_freq 10 --num_workers 0 --wandb.enable false

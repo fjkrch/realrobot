@@ -1,0 +1,37 @@
+{
+  "clamp_events": 0,
+  "errors": [
+    "line 10: max arm delta 17.375855 deg exceeds 3.000000 deg",
+    "line 11: max arm delta 21.232636 deg exceeds 3.000000 deg",
+    "line 12: max arm delta 18.677010 deg exceeds 3.000000 deg",
+    "line 13: max arm delta 6.774609 deg exceeds 3.000000 deg",
+    "line 14: max arm delta 23.512661 deg exceeds 3.000000 deg",
+    "line 15: max arm delta 5.912218 deg exceeds 3.000000 deg",
+    "line 18: max arm delta 3.677200 deg exceeds 3.000000 deg",
+    "line 20: max arm delta 4.642784 deg exceeds 3.000000 deg",
+    "line 21: max arm delta 3.256357 deg exceeds 3.000000 deg",
+    "line 25: max arm delta 3.794685 deg exceeds 3.000000 deg",
+    "line 31: max arm delta 5.691794 deg exceeds 3.000000 deg",
+    "line 33: max arm delta 120.866753 deg exceeds 3.000000 deg",
+    "line 34: max arm delta 37.764664 deg exceeds 3.000000 deg",
+    "line 35: max arm delta 27.677376 deg exceeds 3.000000 deg",
+    "line 36: max arm delta 16.427735 deg exceeds 3.000000 deg",
+    "line 37: max arm delta 16.481575 deg exceeds 3.000000 deg",
+    "line 38: max arm delta 7.865501 deg exceeds 3.000000 deg",
+    "line 41: max arm delta 7.998008 deg exceeds 3.000000 deg",
+    "line 42: max arm delta 9.840965 deg exceeds 3.000000 deg",
+    "line 44: max arm delta 4.635551 deg exceeds 3.000000 deg"
+  ],
+  "expected_steps": 50,
+  "first_target_delta_from_start_deg": 13.091019,
+  "first_target_tolerance_deg": 15.0,
+  "gripper_sent_to_real": false,
+  "max_allowed_arm_delta_deg": 3.0,
+  "max_observed_arm_delta_deg": 120.866753,
+  "ok": false,
+  "real_gripper_disabled": true,
+  "records": 50,
+  "side": "right",
+  "trajectory": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/sim_first_20260618_122511/trajectories/task001_red_cube_commands.jsonl"
+}
+[replay-openarm] audit-only complete; no real robot commands sent.

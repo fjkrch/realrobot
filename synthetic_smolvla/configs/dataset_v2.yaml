@@ -1,0 +1,27 @@
+dataset:
+  name: openarm_synth_v2
+  output_dir: synthetic_smolvla/datasets/openarm_synth_v2
+  manifest: synthetic_smolvla/datasets/openarm_synth_v2/oracle_manifest.jsonl
+  total_episodes: 5000
+  seed: 2202
+  randomized: true
+  all_objects_visible_ratio: 0.35
+  episodes_per_object:
+    orange_ball: 1250
+    red_cube: 1250
+    green_cube: 1250
+    blue_cube: 1250
+  randomization:
+    object_xy_jitter_m: 0.035
+    cube_yaw_jitter_deg: 180.0
+    light_intensity_scale: [0.75, 1.25]
+    camera_xyz_jitter_m: [0.025, 0.025, 0.020]
+    table_texture_variants: 4
+    background_texture_variants: 4
+  capture:
+    rgb: true
+    joint_state: true
+    action: true
+    language: true
+    success_label: true
+

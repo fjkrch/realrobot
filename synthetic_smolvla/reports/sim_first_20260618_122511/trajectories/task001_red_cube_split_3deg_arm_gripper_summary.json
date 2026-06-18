@@ -1,0 +1,13 @@
+{
+  "include_gripper_delta": true,
+  "include_start_interpolation": true,
+  "input": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/sim_first_20260618_122511/trajectories/task001_red_cube_commands.jsonl",
+  "input_records": 50,
+  "inserted_steps": 131,
+  "max_input_arm_delta_deg": 120.866753,
+  "max_joint_delta_deg": 3.0,
+  "max_output_arm_delta_deg": 2.956109,
+  "output": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/sim_first_20260618_122511/trajectories/task001_red_cube_split_3deg_arm_gripper_commands.jsonl",
+  "output_records": 181,
+  "side": "right"
+}

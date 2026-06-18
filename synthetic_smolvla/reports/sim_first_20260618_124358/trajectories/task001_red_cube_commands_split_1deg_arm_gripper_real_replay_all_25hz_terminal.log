@@ -1,0 +1,35 @@
+{
+  "clamp_events": 0,
+  "delta_check_includes_gripper": true,
+  "errors": [],
+  "expected_steps": null,
+  "first_target_delta_from_start_deg": 0.914411,
+  "first_target_tolerance_deg": 15.0,
+  "gripper_sent_to_real": true,
+  "max_allowed_arm_delta_deg": 1.0,
+  "max_allowed_checked_delta_deg": 1.0,
+  "max_observed_arm_delta_deg": 0.999262,
+  "max_observed_checked_delta_deg": 0.999262,
+  "ok": true,
+  "real_gripper_disabled": false,
+  "records": 539,
+  "side": "right",
+  "trajectory": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/sim_first_20260618_124358/trajectories/task001_red_cube_commands_split_1deg_arm_gripper.jsonl"
+}
+[replay-openarm] real helper ready.
+{
+  "real_gripper_disabled": false,
+  "real_side": "right",
+  "real_state_deg": [
+    -9.49684,
+    0.75406,
+    -0.25135,
+    21.45258,
+    -0.46992,
+    13.9338,
+    -14.21794,
+    -64.75118
+  ]
+}
+[replay-openarm] moving real arm to configured start pose.
+[replay-openarm] safety abort: Real start pose not reached after streamed preparation: max_error=15.931 deg, tolerance=2.000 deg.

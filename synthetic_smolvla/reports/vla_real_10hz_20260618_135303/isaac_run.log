@@ -1,0 +1,132 @@
+[3gH    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H  [INFO] Using python from: /home/chyanin/miniconda3/envs/env_isaaclab/bin/python
+[interactive-vla] simulation only; no real robot commands are used.
+[interactive-vla] dry-run mirror trace: /home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/vla_real_10hz_20260618_135303/dry_run_trace.jsonl
+[interactive-vla] using checkpoint /home/chyanin/Desktop/realrobot/synthetic_smolvla/checkpoints/smolvla_openarm_dense_isaac_camera_v1/checkpoints/015000/pretrained_model_typed
+[interactive-vla] launching Isaac (headless=False)
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /home/chyanin/IsaacLab/apps/isaaclab.python.rendering.kit
+Loading user config located at: '/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260618_135512.log
+2026-06-18T06:55:12Z [4ms] [Warning] [omni.ext.plugin] [ext: hsi_pregrasp_refusal] Extensions config 'extension.toml' doesn't exist '/home/chyanin/IsaacLab/source/hsi_pregrasp_refusal' or '/home/chyanin/IsaacLab/source/hsi_pregrasp_refusal/config'
+2026-06-18T06:55:13Z [660ms] [Warning] [gpu.foundation.plugin] Skipping unsupported non-NVIDIA GPU: AMD Radeon 780M Graphics (RADV PHOENIX)
+2026-06-18T06:55:13Z [661ms] [Warning] [gpu.foundation.plugin] Skipping unsupported non-NVIDIA GPU: AMD Radeon 780M Graphics (RADV PHOENIX)
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.159.03    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 4060 Laptop.. | Yes: 0 |     | 8188    MB | 10de      | 0          |
+|     |                                  |        |     |            | 28e0      | 78564eae.. |
+|     |                                  |        |     |            | 1         |            |
+|---------------------------------------------------------------------------------------------|
+| 1   | AMD Radeon 780M Graphics (RADV.. |        |     | 5396    MB | 1002      | 0          |
+|     |                                  |        |     |            | 15bf      | 00000000.. |
+|     |                                  |        |     |            | 6         |            |
+|=============================================================================================|
+| OS: 24.04.3 LTS (Noble Numbat) ubuntu, Version: 24.04.3, Kernel: 6.17.0-35-generic
+| XServer Vendor: The X.Org Foundation, XServer Version: 12101011 (1.21.1.11)
+| Processor: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+| Cores: 8 | Logical Cores: 16
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 15165 | Free Memory: 11025
+| Total Page/Swap (MB): 4095 | Free Page/Swap: 2456
+|---------------------------------------------------------------------------------------------|
+2026-06-18T06:55:13Z [932ms] [Warning] [gpu.foundation.plugin] CPU performance profile is set to powersave. This profile sets the CPU to the lowest frequency reducing performance.
+2026-06-18T06:55:13Z [942ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2026-06-18T06:55:13Z [942ms] [Warning] [gpu.foundation.plugin] Detected IOMMU is enabled. Running CUDA peer-to-peer bandwidth and latency validation.
+Unidirectional P2P=Enabled Bandwidth (P2P Writes) Matrix (GB/s)
+   D\D     0 
+     0 198.29 
+P2P=Enabled Latency (P2P Writes) Matrix (us)
+   GPU     0 
+     0   1.59 
+
+   CPU     0 
+     0   1.89 
+2026-06-18T06:55:14Z [1,657ms] [Warning] [omni.log] Source: omni.hydra was already registered.
+2026-06-18T06:55:14Z [2,061ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-06-18T06:55:14Z [2,069ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+2026-06-18T06:55:16Z [3,389ms] [Warning] [pxr.Semantics] pxr.Semantics is deprecated - please use Semantics instead
+2026-06-18T06:55:16Z [3,710ms] [Warning] [omni.graph.core.plugin] Found duplicate of category 'Replicator' - was 'Annotators', adding 'Fabric Reader'
+2026-06-18T06:55:16Z [3,710ms] [Warning] [omni.graph.core.plugin] Category 'Replicator' not accepted on node type 'omni.replicator.core.FabricReader' in extension 'omni.replicator.core'
+2026-06-18T06:55:16Z [3,710ms] [Warning] [omni.replicator.core.scripts.extension] No material configuration file, adding configuration to material settings directly.
+2026-06-18T06:55:18Z [5,382ms] [Warning] [omni.fabric.plugin] Warning: attribute viewportHandle not found for bucket id 9
+
+[interactive-vla] loading policy
+Loading  HuggingFaceTB/SmolVLM2-500M-Video-Instruct weights ...
+`torch_dtype` is deprecated! Use `dtype` instead!
+Reducing the number of VLM layers to 16 ...
+Loading weights from local directory
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-06-18_13-55-36.log[0m
+[36m======================================================================================[0m
+
+[33m13:55:36 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[33m13:55:40 [articulation.py] WARNING: Not all actuators are configured! Total number of actuated joints not equal to number of joints available: 18 != 22.[0m
+2026-06-18T06:55:40Z [27,535ms] [Warning] [omni.fabric.plugin] USD->Fabric: Unhandled array type string[]
+2026-06-18T06:55:40Z [27,540ms] [Warning] [usdrt.population.plugin] [UsdNoticeHandler] Unhandled attribute type VtArray<std::string> (prim attribute: omni:rtx:material:db:flattener:transmittance_color)
+2026-06-18T06:55:40Z [27,540ms] [Warning] [usdrt.population.plugin] [UsdNoticeHandler] Unhandled attribute type VtArray<std::string> (prim attribute: omni:rtx:material:db:flattener:ior_constant)
+2026-06-18T06:55:40Z [27,540ms] [Warning] [usdrt.population.plugin] [UsdNoticeHandler] Unhandled attribute type VtArray<std::string> (prim attribute: omni:rtx:material:db:flattener:reflection_roughness_constant)
+2026-06-18T06:55:40Z [27,605ms] [Warning] [omni.fabric.plugin] getAttributeCount called on non-existent path /World/envs/env_0/Robot/openarm_right_right_finger/collisions/openarm_right_right_finger_collision
+2026-06-18T06:55:40Z [27,605ms] [Warning] [omni.fabric.plugin] getTypes called on non-existent path /World/envs/env_0/Robot/openarm_right_right_finger/collisions/openarm_right_right_finger_collision
+2026-06-18T06:55:41Z [28,371ms] [Warning] [rtx.postprocessing.plugin] DLSS increasing input dimensions: Render resolution of (148, 148) is below minimal input resolution of 300.
+[interactive-vla] Isaac render interval: every 1 physics step(s) (final step of each command always renders)
+
+[interactive-vla] reset to random object poses:
+  orange_ball: [+0.286, -0.264, +0.550] m
+  red_cube: [+0.294, -0.206, +0.550] m
+  green_cube: [+0.308, -0.139, +0.550] m
+  blue_cube: [+0.300, -0.073, +0.550] m
+
+Type task (orange/red/green/blue, reset, hold, or q to release): [interactive-vla] task 1: typed='pick red', policy_instruction='pick up the red cube'
+[interactive-vla] saved /home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/vla_real_10hz_20260618_135303/debug_frames/task001_initial_rgb.ppm
+[interactive-vla] saved /home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/vla_real_10hz_20260618_135303/debug_frames/task001_initial_depth.pgm (depth min/mean/max=0.475/1.479/4.946 m)
+2026-06-18T06:55:50Z [37,603ms] [Warning] [carb] Client gpu.foundation.plugin has acquired [gpu::unstable::IMemoryBudgetManagerFactory v0.1] 100 times. Consider accessing this interface with carb::getCachedInterface() (Performance warning)
+[interactive-vla] saved /home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/vla_real_10hz_20260618_135303/debug_frames/task001_final_rgb.ppm
+[interactive-vla] saved /home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/vla_real_10hz_20260618_135303/debug_frames/task001_final_depth.pgm (depth min/mean/max=0.475/1.570/4.946 m)
+{
+  "limit_clamp_events": 31,
+  "object_poses_m": {
+    "blue_cube": [
+      0.30043,
+      -0.07264,
+      0.55
+    ],
+    "green_cube": [
+      0.30764,
+      -0.13904,
+      0.55
+    ],
+    "orange_ball": [
+      0.28613,
+      -0.26399,
+      0.55
+    ],
+    "red_cube": [
+      0.29355,
+      -0.20642,
+      0.55
+    ]
+  },
+  "object_rises_m": {
+    "blue_cube": 0.0,
+    "green_cube": 0.0,
+    "orange_ball": 0.0,
+    "red_cube": 0.15996
+  },
+  "real_replay_status": "not_requested",
+  "success": true,
+  "target": "red_cube",
+  "target_rise_m": 0.15996,
+  "task_index": 1,
+  "trajectory_jsonl": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/vla_real_10hz_20260618_135303/trajectories/task001_red_cube_commands.jsonl",
+  "trajectory_summary": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/vla_real_10hz_20260618_135303/trajectories/task001_red_cube_summary.json",
+  "wrong_object_lifted": false
+}
+[interactive-vla] task finished; sim scene is holding the final pose. Type reset before another task, hold to keep holding, or q to quit.
+
+Task finished and holding. Type reset to start again, hold, or q to release: 

@@ -1,0 +1,39 @@
+{
+  "limit_clamp_events": 33,
+  "object_poses_m": {
+    "blue_cube": [
+      0.30043,
+      -0.07264,
+      0.55
+    ],
+    "green_cube": [
+      0.30764,
+      -0.13904,
+      0.55
+    ],
+    "orange_ball": [
+      0.28613,
+      -0.26399,
+      0.55
+    ],
+    "red_cube": [
+      0.29355,
+      -0.20642,
+      0.55
+    ]
+  },
+  "object_rises_m": {
+    "blue_cube": 0.0,
+    "green_cube": 0.0,
+    "orange_ball": 0.0,
+    "red_cube": 0.16471
+  },
+  "real_replay_status": "not_requested",
+  "success": true,
+  "target": "red_cube",
+  "target_rise_m": 0.16471,
+  "task_index": 1,
+  "trajectory_jsonl": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/sim_first_20260618_122511/trajectories/task001_red_cube_commands.jsonl",
+  "trajectory_summary": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/sim_first_20260618_122511/trajectories/task001_red_cube_summary.json",
+  "wrong_object_lifted": false
+}

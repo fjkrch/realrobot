@@ -1,0 +1,18 @@
+{
+  "clamp_events": 0,
+  "delta_check_includes_gripper": true,
+  "errors": [],
+  "expected_steps": null,
+  "first_target_delta_from_start_deg": 0.916783,
+  "first_target_tolerance_deg": 15.0,
+  "gripper_sent_to_real": true,
+  "max_allowed_arm_delta_deg": 3.0,
+  "max_allowed_checked_delta_deg": 3.0,
+  "max_observed_arm_delta_deg": 0.999597,
+  "max_observed_checked_delta_deg": 0.999597,
+  "ok": true,
+  "real_gripper_disabled": false,
+  "records": 489,
+  "side": "right",
+  "trajectory": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/vla_real_10hz_20260618_135303/trajectories/task001_red_cube_commands_upsampled_3deg_gripper.jsonl"
+}

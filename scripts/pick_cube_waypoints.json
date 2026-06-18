@@ -1,0 +1,20 @@
+{
+  "_README": "Scripted cube-pick waypoints for OpenArm. These poses are PLACEHOLDERS. Workflow: (1) python scripts/pick_cube.py --teach  to capture real poses by hand, (2) python scripts/pick_cube.py --sim-only  to watch the sequence in Isaac, (3) python scripts/pick_cube.py --i-am-at-robot  to run it on the real robot. Real replay is refused while 'taught' is false unless you pass --force-untaught.",
+  "side": "right",
+  "port": "can0",
+  "max_rel": 5.0,
+  "tolerance_deg": 1.5,
+  "hold_sec": 0.3,
+  "settle_timeout_sec": 25.0,
+  "taught": false,
+  "gripper_open_deg": -40,
+  "gripper_closed_deg": -5,
+  "waypoints": [
+    {"name": "home",     "dwell": 0.4, "pose": {"joint_1": 0, "joint_2": 10, "joint_3": 0, "joint_4": 30, "joint_5": 0, "joint_6": 10, "joint_7": 0, "gripper": -40}},
+    {"name": "pregrasp", "dwell": 0.4, "pose": {"joint_1": 0, "joint_2": 30, "joint_3": 0, "joint_4": 70, "joint_5": 0, "joint_6": 15, "joint_7": 0, "gripper": -40}},
+    {"name": "descend",  "dwell": 0.4, "pose": {"joint_1": 0, "joint_2": 40, "joint_3": 0, "joint_4": 85, "joint_5": 0, "joint_6": 20, "joint_7": 0, "gripper": -40}},
+    {"name": "grasp",    "dwell": 0.8, "pose": {"joint_1": 0, "joint_2": 40, "joint_3": 0, "joint_4": 85, "joint_5": 0, "joint_6": 20, "joint_7": 0, "gripper": -5}},
+    {"name": "lift",     "dwell": 0.4, "pose": {"joint_1": 0, "joint_2": 20, "joint_3": 0, "joint_4": 50, "joint_5": 0, "joint_6": 10, "joint_7": 0, "gripper": -5}},
+    {"name": "retreat",  "dwell": 0.4, "pose": {"joint_1": 0, "joint_2": 10, "joint_3": 0, "joint_4": 30, "joint_5": 0, "joint_6": 10, "joint_7": 0, "gripper": -5}}
+  ]
+}

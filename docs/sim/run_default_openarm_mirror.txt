@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Standalone default-pose OpenArm Isaac mirror.
+#
+# This is separate from the hsi_pregrasp_refusal task project. It opens only
+# the OpenArm robot in Isaac Sim, with no cube, no pick behavior, and no episode
+# resets. Jetson commands can move simulated joints and gripper only.
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+HOST="${HOST:-10.10.10.1}"
+PORT="${PORT:-8765}"
+OPENARM_SETUP="${OPENARM_SETUP:-bimanual}"
+CONTROL_ARM="${CONTROL_ARM:-right}"
+DEFAULT_GRIPPER_DEG="${DEFAULT_GRIPPER_DEG:-0}"
+DEBUG_INTERVAL="${DEBUG_INTERVAL:-100}"
+HEADLESS="${HEADLESS:-0}"
+
+headless_args=()
+if [ "${HEADLESS}" = "1" ]; then
+  headless_args+=(--headless)
+fi
+
+"${repo_root}/scripts/isaaclab_python.sh" \
+  "${repo_root}/scripts/openarm_default_pose_live_server.py" \
+  --host "${HOST}" \
+  --port "${PORT}" \
+  --openarm_setup "${OPENARM_SETUP}" \
+  --control_arm "${CONTROL_ARM}" \
+  --default_gripper_deg "${DEFAULT_GRIPPER_DEG}" \
+  --debug_interval "${DEBUG_INTERVAL}" \
+  --rendering_mode balanced \
+  "${headless_args[@]}"

@@ -1,0 +1,82 @@
+scene:
+  name: openarm_four_objects
+  sim_only: true
+  openarm_setup: bimanual
+  active_arm: right
+  # Table + objects sit in the right arm's reachable pocket for a base at
+  # (0,0,0.40): x=0.30, y in [-0.28,-0.08], z=0.55 (table top 0.53). This is the
+  # best-measured geometry. NOTE: pulling objects closer to x=0.24 was tried and
+  # REGRESSED grasps (cubes 83% -> 33%; reports/logs/oracle_ik_closer_check.log):
+  # the 97% limit-clamp at x=0.30 is a safety flag, not the grasp bottleneck.
+  # Grasp success is orientation-sensitive (position-only IK lets the wrist
+  # drift); fixing that needs a correct top-down grasp quaternion, not a closer
+  # spawn. See synthetic_smolvla/README.md -> "Optimization attempts".
+  table:
+    prim_path: /World/Table
+    size_m: [0.40, 0.40, 0.04]
+    pose_m: [0.32, -0.16, 0.51]
+  camera:
+    prim_path: /World/Camera
+    resolution: [640, 480]
+    eye_m: [0.95, -0.85, 1.00]
+    target_m: [0.30, -0.16, 0.54]
+    focal_length_mm: 24.0
+  workspace_bounds_m:
+    x: [0.24, 0.36]
+    y: [-0.30, -0.04]
+    z: [0.54, 0.56]
+
+robot:
+  # World pose of the bimanual OpenArm base. Default floor mount (0,0,0) cannot
+  # reach a tabletop: the right arm only reaches ~z=0.09 from the floor. Raising
+  # the base to z=0.40 (with the table+objects placed in the pocket above) lets
+  # the arm pick: oracle_pick_ik.py measures 5/8 lifts, cubes 5/6. The reachable
+  # pocket for this base is x~0.30, y in [-0.28,-0.08], z~0.55 (IK err <0.01 m,
+  # reports/openarm_reach_probe.json). Re-probe after moving the base or table.
+  base_pose_m: [0.0, 0.0, 0.40]
+  reset_pose_deg:
+    right:
+      joint_1: 0.0
+      joint_2: 20.0
+      joint_3: 0.0
+      joint_4: 55.0
+      joint_5: 0.0
+      joint_6: 15.0
+      joint_7: 0.0
+      gripper: -65.0
+    left:
+      joint_1: 0.0
+      joint_2: -20.0
+      joint_3: 0.0
+      joint_4: 55.0
+      joint_5: 0.0
+      joint_6: -15.0
+      joint_7: 0.0
+      gripper: -65.0
+
+objects:
+  - name: orange_ball
+    instruction: pick up the orange ball
+    shape: sphere
+    color_rgb: [1.0, 0.45, 0.02]
+    radius_m: 0.020
+    spawn_pose_m: [0.30, -0.26, 0.55]
+  - name: red_cube
+    instruction: pick up the red cube
+    shape: cube
+    color_rgb: [0.9, 0.03, 0.03]
+    size_m: [0.035, 0.035, 0.035]
+    spawn_pose_m: [0.30, -0.20, 0.55]
+  - name: green_cube
+    instruction: pick up the green cube
+    shape: cube
+    color_rgb: [0.05, 0.70, 0.12]
+    size_m: [0.035, 0.035, 0.035]
+    spawn_pose_m: [0.30, -0.14, 0.55]
+  - name: blue_cube
+    instruction: pick up the blue cube
+    shape: cube
+    color_rgb: [0.04, 0.20, 0.95]
+    size_m: [0.035, 0.035, 0.035]
+    spawn_pose_m: [0.30, -0.08, 0.55]
+

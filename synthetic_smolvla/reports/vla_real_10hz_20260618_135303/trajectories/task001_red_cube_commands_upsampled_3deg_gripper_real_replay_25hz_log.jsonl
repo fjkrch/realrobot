@@ -1,0 +1,2 @@
+{"disable_gripper_real": false, "max_joint_delta_deg": 1.0, "mirror_rate_hz": 25.0, "trajectory": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/vla_real_10hz_20260618_135303/trajectories/task001_red_cube_commands_upsampled_3deg_gripper.jsonl", "type": "replay_start"}
+{"error": "Real start pose not reached after streamed preparation: max_error=14.860 deg, tolerance=2.000 deg.", "type": "safety_abort"}

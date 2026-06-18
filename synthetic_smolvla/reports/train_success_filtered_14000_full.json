@@ -1,0 +1,89 @@
+{
+  "checkpoint_dir": {
+    "exists": true,
+    "path": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/checkpoints/smolvla_openarm_success_filtered_14000",
+    "removed_gitkeep_dir": true,
+    "usable_for_new_run": true
+  },
+  "command": [
+    "/home/chyanin/miniconda3/envs/env_isaaclab/bin/python",
+    "-m",
+    "lerobot.scripts.lerobot_train",
+    "--dataset.repo_id",
+    "local/openarm_success_filtered_14000",
+    "--dataset.root",
+    "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_success_filtered_14000",
+    "--policy.type",
+    "smolvla",
+    "--policy.device",
+    "cuda",
+    "--policy.push_to_hub",
+    "false",
+    "--policy.repo_id",
+    "local/smolvla_openarm_success_filtered_14000",
+    "--output_dir",
+    "/home/chyanin/Desktop/realrobot/synthetic_smolvla/checkpoints/smolvla_openarm_success_filtered_14000",
+    "--batch_size",
+    "1",
+    "--steps",
+    "10000",
+    "--save_freq",
+    "10000",
+    "--log_freq",
+    "10",
+    "--num_workers",
+    "0",
+    "--wandb.enable",
+    "false"
+  ],
+  "command_output": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/train_success_filtered_14000_full.sh",
+  "dataset": {
+    "exists": true,
+    "missing": [],
+    "ready": true,
+    "root": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_success_filtered_14000"
+  },
+  "modules": {
+    "lerobot": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/lerobot/__init__.py"
+    },
+    "lerobot_dataset": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/lerobot/datasets/lerobot_dataset.py"
+    },
+    "lerobot_train": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/lerobot/scripts/lerobot_train.py"
+    },
+    "smolvla_policy": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/lerobot/policies/smolvla/modeling_smolvla.py"
+    },
+    "torch": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/torch/__init__.py"
+    },
+    "transformers": {
+      "available": true,
+      "origin": "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/transformers/__init__.py"
+    }
+  },
+  "run": {
+    "duration_sec": 1251.411824464798,
+    "returncode": 0,
+    "stderr_tail": "00step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9953/10000 [20:17<00:05,  9.12step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9954/10000 [20:17<00:05,  9.18step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9955/10000 [20:17<00:04,  9.12step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9956/10000 [20:17<00:04,  9.01step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9957/10000 [20:17<00:04,  8.89step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9958/10000 [20:17<00:04,  9.03step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9959/10000 [20:17<00:04,  9.11step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9960/10000 [20:17<00:04,  9.06step/s]INFO 2026-06-17 11:38:49 ot_train.py:435 step:10K smpl:10K ep:2K epch:0.32 loss:0.056 grdn:1.463 lr:2.5e-06 updt_s:0.101 data_s:0.009\n\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9961/10000 [20:18<00:04,  8.96step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9962/10000 [20:18<00:04,  9.04step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9963/10000 [20:18<00:04,  9.06step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9964/10000 [20:18<00:03,  9.00step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9965/10000 [20:18<00:03,  8.97step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9966/10000 [20:18<00:03,  9.07step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9967/10000 [20:18<00:03,  9.15step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9968/10000 [20:18<00:03,  9.08step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9969/10000 [20:18<00:03,  9.06step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9970/10000 [20:19<00:03,  9.09step/s]INFO 2026-06-17 11:38:50 ot_train.py:435 step:10K smpl:10K ep:2K epch:0.32 loss:0.101 grdn:2.092 lr:2.5e-06 updt_s:0.100 data_s:0.009\n\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9971/10000 [20:19<00:03,  9.18step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9972/10000 [20:19<00:03,  9.24step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9973/10000 [20:19<00:02,  9.24step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9974/10000 [20:19<00:02,  9.04step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9975/10000 [20:19<00:02,  9.10step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9976/10000 [20:19<00:02,  9.20step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9977/10000 [20:19<00:02,  9.21step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9978/10000 [20:19<00:02,  9.10step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9979/10000 [20:20<00:02,  9.01step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9980/10000 [20:20<00:02,  9.11step/s]INFO 2026-06-17 11:38:51 ot_train.py:435 step:10K smpl:10K ep:2K epch:0.32 loss:0.052 grdn:1.403 lr:2.5e-06 updt_s:0.099 data_s:0.009\n\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9981/10000 [20:20<00:02,  9.20step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9982/10000 [20:20<00:01,  9.20step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9983/10000 [20:20<00:01,  9.15step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9984/10000 [20:20<00:01,  9.07step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9985/10000 [20:20<00:01,  9.14step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9986/10000 [20:20<00:01,  9.19step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9987/10000 [20:20<00:01,  9.03step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9988/10000 [20:21<00:01,  8.98step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9989/10000 [20:21<00:01,  9.07step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9990/10000 [20:21<00:01,  9.09step/s]INFO 2026-06-17 11:38:52 ot_train.py:435 step:10K smpl:10K ep:2K epch:0.32 loss:0.116 grdn:1.754 lr:2.5e-06 updt_s:0.100 data_s:0.009\n\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9991/10000 [20:21<00:00,  9.19step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9992/10000 [20:21<00:00,  9.06step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9993/10000 [20:21<00:00,  9.05step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9994/10000 [20:21<00:00,  9.15step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9995/10000 [20:21<00:00,  9.13step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9996/10000 [20:21<00:00,  9.02step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9997/10000 [20:22<00:00,  8.94step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9998/10000 [20:22<00:00,  9.04step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 9999/10000 [20:22<00:00,  9.14step/s]\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 10000/10000 [20:22<00:00,  9.20step/s]INFO 2026-06-17 11:38:53 ot_train.py:435 step:10K smpl:10K ep:2K epch:0.32 loss:0.075 grdn:1.641 lr:2.5e-06 updt_s:0.099 data_s:0.009\nINFO 2026-06-17 11:38:53 ot_train.py:455 Checkpoint policy after step 10000\n\nTraining: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 10000/10000 [20:23<00:00,  8.17step/s]\nINFO 2026-06-17 11:38:55 ot_train.py:529 End of training\n",
+    "stdout_tail": "Reducing the number of VLM layers to 16 ...\n"
+  },
+  "shell_command": "/home/chyanin/miniconda3/envs/env_isaaclab/bin/python -m lerobot.scripts.lerobot_train --dataset.repo_id local/openarm_success_filtered_14000 --dataset.root /home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_success_filtered_14000 --policy.type smolvla --policy.device cuda --policy.push_to_hub false --policy.repo_id local/smolvla_openarm_success_filtered_14000 --output_dir /home/chyanin/Desktop/realrobot/synthetic_smolvla/checkpoints/smolvla_openarm_success_filtered_14000 --batch_size 1 --steps 10000 --save_freq 10000 --log_freq 10 --num_workers 0 --wandb.enable false",
+  "status": "completed",
+  "training_config": {
+    "batch_size": 4,
+    "checkpoint_dir": "synthetic_smolvla/checkpoints/smolvla_openarm_success_filtered_14000",
+    "dataset": "synthetic_smolvla/datasets/openarm_success_filtered_14000",
+    "device": "cuda",
+    "policy": "smolvla",
+    "run_mode": "preflight_only",
+    "steps": 10000
+  }
+}

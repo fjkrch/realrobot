@@ -1,0 +1,33 @@
+{
+  "inputs": [
+    {
+      "episodes": 469,
+      "frames": 46900,
+      "repo_id": "local/openarm_real_table_zero_v1_lift5cm_routed_v1",
+      "root": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_routed_v1"
+    },
+    {
+      "episodes": 255,
+      "frames": 25500,
+      "repo_id": "local/openarm_real_table_zero_v1_lift5cm_orange_right_extra_m3_256",
+      "root": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_orange_right_extra_m3_256"
+    },
+    {
+      "episodes": 250,
+      "frames": 25000,
+      "repo_id": "local/openarm_real_table_zero_v1_lift5cm_red_right_extra_m3_256",
+      "root": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_red_right_extra_m3_256"
+    }
+  ],
+  "ok": true,
+  "output_root": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_routed_v2_extra_right",
+  "repo_id": "local/openarm_real_table_zero_v1_lift5cm_routed_v2_extra_right",
+  "task_frame_counts": {
+    "pick up the blue cube": 12200,
+    "pick up the green cube": 9200,
+    "pick up the orange ball": 38300,
+    "pick up the red cube": 37700
+  },
+  "total_episodes": 974,
+  "total_frames": 97400
+}

@@ -96,7 +96,7 @@ User-measured layout scene:
 
 - table height: 75 cm
 - table edge/width: 150 cm
-- robot height: 115 cm
+- robot height: 125 cm
 - robot base: 43 cm
 - table-to-robot gap: 30 cm
 - calculated horizontal span: 223 cm

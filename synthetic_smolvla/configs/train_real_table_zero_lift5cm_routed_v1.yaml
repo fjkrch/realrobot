@@ -1,0 +1,21 @@
+training:
+  dataset: synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_routed_v1
+  checkpoint_dir: synthetic_smolvla/checkpoints/smolvla_openarm_real_table_zero_lift5cm_routed_v1
+  policy: smolvla
+  policy_path: lerobot/smolvla_base
+  device: cuda
+  batch_size: 1
+  steps: 20000
+  save_freq: 5000
+  # Dataset contract:
+  # - Simulation only, real Isaac robot-view camera frames.
+  # - Lift waypoint is 5 cm above grasp waypoint.
+  # - Gripper close cap is -3 deg; do not train on deeper closure.
+  # - Orange/red are right-arm routed, green/blue are left-arm routed.
+  # - Rejected source episodes include object collisions, gripper/table contact,
+  #   object sweep/slide, wrong-object lifts, and failed target lifts.
+  # Keep chunk_size at the pretrained smolvla_base value. The dense episodes are
+  # 100 frames, but the pretrained action head expects chunk_size=50.
+  chunk_size: 50
+  n_action_steps: 10
+  run_mode: preflight_only

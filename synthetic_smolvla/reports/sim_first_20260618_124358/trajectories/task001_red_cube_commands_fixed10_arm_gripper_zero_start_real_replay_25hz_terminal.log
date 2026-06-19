@@ -57,9 +57,9 @@
         0.0,
         0.0,
         0.0,
-        -65.0
+        0.0
       ],
-      "gripper_command_deg": -65.0,
+      "gripper_command_deg": 0.0,
       "label": "zero_arm_staging_pose"
     },
     "zero_stage_sec": 8.0
@@ -70,16 +70,16 @@
   "real_gripper_disabled": false,
   "real_side": "right",
   "real_state_deg": [
-    -1.12563,
-    -0.84149,
-    -0.09836,
-    0.25135,
-    0.14207,
-    -4.07632,
-    -2.43705,
-    -64.77304
+    -3.26761,
+    1.56277,
+    0.75406,
+    5.23474,
+    -8.44771,
+    8.49142,
+    -10.30555,
+    -0.62292
   ]
 }
 [zero-start-replay] sending zero staging pose; not waiting for stable zero.
 [zero-start-replay] moving to configured sim init pose.
-[zero-start-replay] safety abort: Timed out waiting for real helper response.
+[zero-start-replay] safety abort: HelperError: Start pose not reached within 120.0s; max_error=15.974 deg at joint_4; state_deg=[-0.469924, 15.376356, -0.054642, 39.025564, -0.273212, 14.85179, -0.666637, -64.598183]; target_deg=[0.0, 20.0, 0.0, 55.0, 0.0, 15.0, 0.0, -65.0]; errors_deg={'joint_1': 0.469924, 'joint_2': 4.623644, 'joint_3': 0.054642, 'joint_4': 15.974436, 'joint_5': 0.273212, 'joint_6': 0.14821, 'joint_7': 0.666637, 'gripper': 0.401817}; last_sent={'joint_1.pos': np.float64(0.0), 'joint_2.pos': np.float64(16.37635648411279), 'joint_3.pos': np.float64(0.0), 'joint_4.pos': np.float64(40.02556432463899), 'joint_5.pos': np.float64(0.0), 'joint_6.pos': np.float64(15.0), 'joint_7.pos': np.float64(0.0), 'gripper.pos': np.float64(-65.0)}; torque was released by disconnect.

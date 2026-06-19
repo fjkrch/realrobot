@@ -61,6 +61,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="optional gripper target; default sends gripper to 0 during zero pose",
     )
     parser.add_argument("--max-joint-delta-deg", type=float, default=1.0)
+    parser.add_argument(
+        "--real-helper-max-rel-deg",
+        type=float,
+        default=None,
+        help="OpenArmFollower max_relative_target sent to the helper",
+    )
     parser.add_argument("--real-pose-tolerance-deg", type=float, default=DEFAULT_START_POSE_TOLERANCE_DEG)
     parser.add_argument("--real-pose-timeout-sec", type=float, default=120.0)
     parser.add_argument("--real-pose-hold-sec", type=float, default=0.05)
@@ -114,6 +120,7 @@ def _build_real_config(args: argparse.Namespace, *, side: str) -> RealMirrorConf
         max_joint_delta_deg=args.max_joint_delta_deg,
         watchdog_timeout_sec=args.watchdog_timeout_sec,
         disable_gripper_real=args.disable_gripper_real,
+        helper_max_relative_target_deg=args.real_helper_max_rel_deg,
         host=args.real_host,
         user=args.real_user,
         repo=args.real_repo,

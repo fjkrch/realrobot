@@ -1,0 +1,124 @@
+[3gH    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H   [INFO] Using python from: /home/chyanin/miniconda3/envs/env_isaaclab/bin/python
+[openarm_scene] launching Isaac app
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /home/chyanin/IsaacLab/apps/isaaclab.python.headless.rendering.kit
+Loading user config located at: '/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260618_210034.log
+2026-06-18T14:00:34Z [4ms] [Warning] [omni.ext.plugin] [ext: hsi_pregrasp_refusal] Extensions config 'extension.toml' doesn't exist '/home/chyanin/IsaacLab/source/hsi_pregrasp_refusal' or '/home/chyanin/IsaacLab/source/hsi_pregrasp_refusal/config'
+2026-06-18T14:00:34Z [497ms] [Warning] [gpu.foundation.plugin] Skipping unsupported non-NVIDIA GPU: AMD Radeon 780M Graphics (RADV PHOENIX)
+2026-06-18T14:00:34Z [497ms] [Warning] [gpu.foundation.plugin] Skipping unsupported non-NVIDIA GPU: AMD Radeon 780M Graphics (RADV PHOENIX)
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.159.03    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 4060 Laptop.. | Yes: 0 |     | 8188    MB | 10de      | 0          |
+|     |                                  |        |     |            | 28e0      | 78564eae.. |
+|     |                                  |        |     |            | 1         |            |
+|---------------------------------------------------------------------------------------------|
+| 1   | AMD Radeon 780M Graphics (RADV.. |        |     | 5396    MB | 1002      | 0          |
+|     |                                  |        |     |            | 15bf      | 00000000.. |
+|     |                                  |        |     |            | 6         |            |
+|=============================================================================================|
+| OS: 24.04.3 LTS (Noble Numbat) ubuntu, Version: 24.04.3, Kernel: 6.17.0-35-generic
+| XServer Vendor: The X.Org Foundation, XServer Version: 12101011 (1.21.1.11)
+| Processor: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+| Cores: 8 | Logical Cores: 16
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 15165 | Free Memory: 4460
+| Total Page/Swap (MB): 4095 | Free Page/Swap: 2599
+|---------------------------------------------------------------------------------------------|
+2026-06-18T14:00:35Z [908ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2026-06-18T14:00:35Z [908ms] [Warning] [gpu.foundation.plugin] Detected IOMMU is enabled. Running CUDA peer-to-peer bandwidth and latency validation.
+Unidirectional P2P=Enabled Bandwidth (P2P Writes) Matrix (GB/s)
+   D\D     0 
+     0 150.73 
+P2P=Enabled Latency (P2P Writes) Matrix (us)
+   GPU     0 
+     0   1.36 
+
+   CPU     0 
+     0   2.78 
+2026-06-18T14:00:36Z [1,829ms] [Warning] [omni.log] Source: omni.hydra was already registered.
+2026-06-18T14:00:36Z [2,114ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-06-18T14:00:36Z [2,126ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+2026-06-18T14:00:38Z [3,861ms] [Warning] [pxr.Semantics] pxr.Semantics is deprecated - please use Semantics instead
+2026-06-18T14:00:38Z [3,985ms] [Warning] [omni.graph.core.plugin] Found duplicate of category 'Replicator' - was 'Annotators', adding 'Fabric Reader'
+2026-06-18T14:00:38Z [3,985ms] [Warning] [omni.graph.core.plugin] Category 'Replicator' not accepted on node type 'omni.replicator.core.FabricReader' in extension 'omni.replicator.core'
+2026-06-18T14:00:38Z [3,986ms] [Warning] [omni.replicator.core.scripts.extension] No material configuration file, adding configuration to material settings directly.
+2026-06-18T14:00:39Z [5,458ms] [Warning] [omni.kvdb.plugin] Disabling key-value database because another kit process is locking it
+2026-06-18T14:00:42Z [7,985ms] [Warning] [omni.fabric.plugin] Warning: attribute viewPickingId not found for bucket id 7
+
+[openarm_scene] importing Isaac Lab APIs
+[openarm_scene] creating simulation context
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-06-18_21-00-42.log[0m
+[36m======================================================================================[0m
+
+[33m21:00:43 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[openarm_scene] creating interactive scene
+[openarm_scene] resetting sim
+2026-06-18T14:00:47Z [13,001ms] [Error] [omni.physx.tensors.plugin] CUDA error: out of memory: ../../../extensions/runtime/source/omni.physx.tensors/plugins/gpu/CudaCommon.h: 74
+2026-06-18T14:00:47Z [13,002ms] [Error] [omni.physx.tensors.plugin] Unable to allocate memory of size 671088640 for mGpuContactPairsDev
+2026-06-18T14:00:47Z [13,123ms] [Error] [omni.physx.tensors.plugin] CUDA error: out of memory: ../../../extensions/runtime/source/omni.physx.tensors/plugins/gpu/CudaKernels.cu: 573
+2026-06-18T14:00:47Z [13,123ms] [Error] [omni.physx.tensors.plugin] Failed to fetch DOF velocity attribute
+2026-06-18T14:00:47Z [13,428ms] [Warning] [omni.fabric.plugin] getAttributeCount called on non-existent path /World/envs/env_0/Robot/openarm_right_right_finger/collisions/openarm_right_right_finger_collision
+2026-06-18T14:00:47Z [13,428ms] [Warning] [omni.fabric.plugin] getTypes called on non-existent path /World/envs/env_0/Robot/openarm_right_right_finger/collisions/openarm_right_right_finger_collision
+2026-06-18T14:00:48Z [14,686ms] [Error] [carb.graphics-vulkan.plugin] Out of GPU memory allocating resource 'MemoryManager-allocate' [size: unknown]
+2026-06-18T14:00:48Z [14,686ms] [Error] [carb.graphics-vulkan.plugin] Failure injector rule to repro:
+{
+    debugName="MemoryManager-allocate",
+}
+2026-06-18T14:00:48Z [14,686ms] [Error] [carb.graphics-vulkan.plugin] VkResult: ERROR_OUT_OF_DEVICE_MEMORY
+2026-06-18T14:00:48Z [14,686ms] [Error] [carb.graphics-vulkan.plugin] vkAllocateMemory failed for flags: 0.
+2026-06-18T14:00:48Z [14,686ms] [Error] [gpu.foundation.plugin] Unable to allocate buffer
+2026-06-18T14:00:48Z [14,686ms] [Error] [gpu.foundation.plugin] Buffer creation failed for the device: 0.
+2026-06-18T14:00:48Z [14,686ms] [Error] [gpu.foundation.plugin] Failed to update params for RenderOp 25
+2026-06-18T14:00:48Z [14,686ms] [Error] [gpu.foundation.plugin] Failed to update params for RenderOp Cached PT ClearAll. Will not execute this or subsequent RenderGraph operations. Aborting RenderGraph execution
+2026-06-18T14:00:48Z [14,687ms] [Error] [carb.scenerenderer-rtx.plugin] Failed to execute RenderGraph on device 0. Error Code: 7
+2026-06-18T14:00:48Z [14,687ms] [Warning] [omni.hydra] Rendering failed.
+2026-06-18T14:00:48Z [14,687ms] [Error] [omni.usd] HydraEngine::render failed to end the compute graph: error code 6
+Traceback (most recent call last):
+  File "/home/chyanin/Desktop/realrobot/synthetic_smolvla/scripts/make_scene.py", line 385, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/chyanin/Desktop/realrobot/synthetic_smolvla/scripts/make_scene.py", line 358, in main
+    result = run_isaac_scene(
+             ^^^^^^^^^^^^^^^^
+  File "/home/chyanin/Desktop/realrobot/synthetic_smolvla/scripts/make_scene.py", line 253, in run_isaac_scene
+    sim.reset()
+  File "/home/chyanin/IsaacLab/source/isaaclab/isaaclab/sim/simulation_context.py", line 524, in reset
+    self.render()
+  File "/home/chyanin/IsaacLab/source/isaaclab/isaaclab/sim/simulation_context.py", line 595, in render
+    raise exception_to_raise
+  File "/home/chyanin/IsaacLab/source/isaaclab/isaaclab/assets/asset_base.py", line 316, in _initialize_callback
+    self._initialize_impl()
+  File "/home/chyanin/IsaacLab/source/isaaclab/isaaclab/assets/articulation/articulation.py", line 1548, in _initialize_impl
+    self._data = ArticulationData(self.root_physx_view, self.device)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/chyanin/IsaacLab/source/isaaclab/isaaclab/assets/articulation/articulation_data.py", line 67, in __init__
+    self._previous_joint_vel = self._root_physx_view.get_dof_velocities().clone()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.tensors-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics/tensors/impl/api.py", line 1764, in get_dof_velocities
+    raise Exception("Failed to get DOF velocities from backend")
+Exception: Failed to get DOF velocities from backend
+2026-06-18T14:00:49Z [14,913ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator:Annotators' for removal
+2026-06-18T14:00:49Z [14,913ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator:Annotators' for removal
+2026-06-18T14:00:49Z [14,913ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator' for removal
+2026-06-18T14:00:49Z [14,913ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator:Annotators' for removal
+2026-06-18T14:00:49Z [14,913ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator:Annotators' for removal
+2026-06-18T14:00:49Z [14,913ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator:Annotators' for removal
+2026-06-18T14:00:49Z [14,914ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator:Annotators' for removal
+2026-06-18T14:00:49Z [14,914ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator:Annotators' for removal
+2026-06-18T14:00:49Z [14,914ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator:Annotators' for removal
+2026-06-18T14:00:49Z [14,914ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator:Annotators' for removal
+2026-06-18T14:00:49Z [14,914ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator:Annotators' for removal
+2026-06-18T14:00:49Z [14,914ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator:Annotators' for removal
+2026-06-18T14:00:49Z [14,914ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator:Annotators' for removal
+2026-06-18T14:00:49Z [14,914ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator:Core' for removal
+2026-06-18T14:00:49Z [14,924ms] [Warning] [omni.physx.plugin] USD stage detach not called, holding a loose ptr to a stage!
+2026-06-18T14:00:49Z [15,480ms] [Warning] [carb] Client omni.syntheticdata.plugin Failed to acquire interface [omni::graph::core::INode v4.10] while unloading all plugins

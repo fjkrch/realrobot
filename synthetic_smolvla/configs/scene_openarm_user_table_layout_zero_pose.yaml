@@ -10,7 +10,7 @@ scene:
   layout_info_cm:
     table_height: 75.0
     table_edge_width: 150.0
-    robot_plus_table_height: 115.0
+    robot_plus_table_height: 125.0
     robot_base_width: 43.0
     table_to_robot_gap: 30.0
     total_horizontal_space: 223.0
@@ -28,8 +28,9 @@ scene:
   camera:
     prim_path: /World/Camera
     resolution: [1280, 720]
-    eye_m: [2.70, -2.45, 1.65]
-    target_m: [0.85, 0.0, 0.72]
+    # Center the viewer/camera on the full object row so all four objects are visible.
+    eye_m: [1.35, -1.10, 1.20]
+    target_m: [0.68, 0.0, 0.765]
     focal_length_mm: 24.0
   workspace_bounds_m:
     x: [0.52, 2.02]

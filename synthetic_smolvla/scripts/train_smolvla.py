@@ -14,7 +14,7 @@ import subprocess
 import sys
 import time
 
-from sim_contract import CONFIG_DIR, load_yaml_config
+from sim_contract import CONFIG_DIR, REPO_ROOT, load_yaml_config
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -64,6 +64,11 @@ def dataset_ready(dataset_root: Path) -> dict:
     }
 
 
+def repo_path(path: str | Path) -> Path:
+    resolved = Path(path)
+    return resolved if resolved.is_absolute() else REPO_ROOT / resolved
+
+
 def prepare_checkpoint_dir(path: Path, *, overwrite_gitkeep_only: bool) -> dict:
     if not path.exists():
         return {"path": str(path), "exists": False, "usable_for_new_run": True}
@@ -79,8 +84,8 @@ def prepare_checkpoint_dir(path: Path, *, overwrite_gitkeep_only: bool) -> dict:
 
 def build_train_command(config: dict, *, steps: int | None, batch_size: int | None, policy_path: str | None) -> list[str]:
     training = config["training"]
-    dataset_root = str((Path.cwd() / training["dataset"]).resolve())
-    output_dir = str((Path.cwd() / training["checkpoint_dir"]).resolve())
+    dataset_root = str(repo_path(training["dataset"]).resolve())
+    output_dir = str(repo_path(training["checkpoint_dir"]).resolve())
     policy_repo_id = f"local/{Path(training['checkpoint_dir']).name}"
     eff_steps = str(steps or training.get("steps", 3000))
     eff_save_freq = str(training.get("save_freq") or eff_steps)
@@ -105,6 +110,11 @@ def build_train_command(config: dict, *, steps: int | None, batch_size: int | No
         # as a single token; the space-separated form is rejected by the parser.
         # Remaining `--policy.*` flags become cli-overrides on the loaded config.
         cmd.append(f"--policy.path={eff_policy_path}")
+        if training.get("infer_input_features_from_dataset", True):
+            # SmolVLA base/checkpoint configs carry stale input feature metadata
+            # (notably observation.state shape [6] and extra cameras). Clearing it
+            # lets lerobot infer the correct camera/state contract from ds_meta.
+            cmd.append("--policy.input_features=null")
     else:
         cmd.extend(["--policy.type", "smolvla"])
         if training.get("load_vlm_weights"):
@@ -139,6 +149,23 @@ def build_train_command(config: dict, *, steps: int | None, batch_size: int | No
         cmd.append(f"--policy.chunk_size={training['chunk_size']}")
     if training.get("n_action_steps"):
         cmd.append(f"--policy.n_action_steps={training['n_action_steps']}")
+    for key in (
+        "optimizer_lr",
+        "optimizer_weight_decay",
+        "optimizer_grad_clip_norm",
+        "scheduler_warmup_steps",
+        "scheduler_decay_steps",
+        "scheduler_decay_lr",
+        "freeze_vision_encoder",
+        "train_expert_only",
+        "train_state_proj",
+        "num_steps",
+    ):
+        if key in training:
+            value = training[key]
+            if isinstance(value, bool):
+                value = str(value).lower()
+            cmd.append(f"--policy.{key}={value}")
     return cmd
 
 
@@ -152,8 +179,8 @@ def main() -> int:
     training = config["training"]
     if args.checkpoint_dir:
         training["checkpoint_dir"] = args.checkpoint_dir
-    dataset_root = (Path.cwd() / training["dataset"]).resolve()
-    checkpoint_dir = (Path.cwd() / training["checkpoint_dir"]).resolve()
+    dataset_root = repo_path(training["dataset"]).resolve()
+    checkpoint_dir = repo_path(training["checkpoint_dir"]).resolve()
     command = build_train_command(
         config,
         steps=args.steps,
@@ -184,7 +211,7 @@ def main() -> int:
     if args.command_output:
         command_output = Path(args.command_output)
         if not command_output.is_absolute():
-            command_output = Path.cwd() / command_output
+            command_output = REPO_ROOT / command_output
         command_output.parent.mkdir(parents=True, exist_ok=True)
         command_output.write_text("#!/usr/bin/env bash\nset -euo pipefail\n" + shell_quote(command) + "\n", encoding="utf-8")
         command_output.chmod(0o755)
@@ -208,7 +235,7 @@ def main() -> int:
 
     output = Path(args.output)
     if not output.is_absolute():
-        output = Path.cwd() / output
+        output = REPO_ROOT / output
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps({"ok": report["status"] in {"prepared", "completed"}, "status": report["status"], "report": str(output)}, indent=2))

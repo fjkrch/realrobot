@@ -1,0 +1,15 @@
+training:
+  dataset: synthetic_smolvla/datasets/openarm_real_table_zero_v1
+  checkpoint_dir: synthetic_smolvla/checkpoints/smolvla_openarm_real_table_zero_v1
+  policy: smolvla
+  policy_path: lerobot/smolvla_base
+  device: cuda
+  batch_size: 1
+  steps: 20000
+  save_freq: 5000
+  # New dataset episodes are 100 frames. When finetuning from smolvla_base,
+  # chunk_size stays at the pretrained value (50) to preserve action-head shapes.
+  # n_action_steps=10 keeps closed-loop re-observation every 10 control frames.
+  chunk_size: 50
+  n_action_steps: 10
+  run_mode: preflight_only

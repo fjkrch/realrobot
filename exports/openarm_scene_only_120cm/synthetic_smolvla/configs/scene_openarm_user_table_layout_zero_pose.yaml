@@ -1,0 +1,86 @@
+scene:
+  name: openarm_user_table_layout_zero_pose
+  sim_only: true
+  openarm_setup: bimanual
+  active_arm: right
+  # Visualization/layout scene from user-measured real setup dimensions.
+  # This intentionally uses an all-zero robot pose, so it opts out of the
+  # stricter SmolVLA training reset-pose margin check.
+  allow_out_of_contract_reset_pose: true
+  layout_info_cm:
+    table_height: 75.0
+    table_edge_width: 150.0
+    robot_plus_table_height: 125.0
+    robot_base_width: 43.0
+    table_to_robot_gap: 30.0
+    total_horizontal_space: 223.0
+  # Coordinate convention used here:
+  # - robot base center is at world x=0, y=0, z=0
+  # - robot base footprint is treated as 43 cm wide, so its front edge is x=0.215 m
+  # - nearest table edge is 30 cm in front of that, at x=0.515 m
+  # - table is 150 cm wide/deep, so its center is x=0.515 + 0.750 = 1.265 m
+  # - table top is 75 cm high; with a 4 cm tabletop, center z=0.730 m
+  table:
+    prim_path: /World/Table
+    size_m: [1.50, 1.50, 0.04]
+    pose_m: [1.265, 0.0, 0.73]
+    color_rgb: [1.0, 0.0, 0.0]
+  camera:
+    prim_path: /World/Camera
+    resolution: [1280, 720]
+    # Center the viewer/camera on the full object row so all four objects are visible.
+    eye_m: [1.55, -1.35, 1.35]
+    target_m: [0.68, 0.0, 0.765]
+    focal_length_mm: 24.0
+  workspace_bounds_m:
+    x: [0.52, 2.02]
+    y: [-0.75, 0.75]
+    z: [0.74, 0.79]
+
+robot:
+  base_pose_m: [0.0, 0.0, 0.0]
+  reset_pose_deg:
+    right:
+      joint_1: 0.0
+      joint_2: 0.0
+      joint_3: 0.0
+      joint_4: 0.0
+      joint_5: 0.0
+      joint_6: 0.0
+      joint_7: 0.0
+      gripper: 0.0
+    left:
+      joint_1: 0.0
+      joint_2: 0.0
+      joint_3: 0.0
+      joint_4: 0.0
+      joint_5: 0.0
+      joint_6: 0.0
+      joint_7: 0.0
+      gripper: 0.0
+
+objects:
+  - name: orange_ball
+    instruction: pick up the orange ball
+    shape: sphere
+    color_rgb: [1.0, 0.45, 0.02]
+    radius_m: 0.020
+    spawn_pose_m: [0.68, -0.24, 0.77]
+  - name: red_cube
+    instruction: pick up the red cube
+    shape: cube
+    color_rgb: [0.9, 0.03, 0.03]
+    size_m: [0.0254, 0.0254, 0.0254]
+    spawn_pose_m: [0.68, -0.08, 0.765]
+  - name: green_cube
+    instruction: pick up the green cube
+    shape: cube
+    color_rgb: [0.05, 0.70, 0.12]
+    size_m: [0.0254, 0.0254, 0.0254]
+    spawn_pose_m: [0.68, 0.08, 0.765]
+  - name: blue_cube
+    instruction: pick up the blue cube
+    shape: cube
+    color_rgb: [0.04, 0.20, 0.95]
+    size_m: [0.0254, 0.0254, 0.0254]
+    spawn_pose_m: [0.68, 0.24, 0.765]

@@ -20,9 +20,10 @@ It writes straight into a LeRobot dataset (so there is no giant image JSONL) and
 also writes a per-episode metadata JSONL (object poses, measured rises, contact,
 limit-clamp, and the dense numeric state/action trace) for auditing.
 
-Only measured successful target-object lifts with no wrong-object lift are kept,
-exactly like the parallel oracle. Targets are sampled with a configurable weight
-so the hard ``orange_ball`` class is over-collected for better balance.
+Only measured successful target-object lifts with no wrong-object lift, no
+object-object collision, and no gripper/table collision are kept. Targets are
+sampled with a configurable weight so the hard ``orange_ball`` class is
+over-collected for better balance.
 
 Simulation only. Never opens CAN, never moves the real robot.
 """
@@ -56,6 +57,56 @@ ACTION_KEY = "action"
 STATE_NAMES = [*JOINT_NAMES, "gripper"]
 
 
+# --- Better safety-check helpers (pure python; unit-tested without Isaac/GPU) ---
+# These replace the two misleading manifest diagnostics:
+#   * min_tcp_table_clearance_m: unconditioned on being over the table footprint, so it
+#     flagged the TCP frame hanging low beside the robot base as if it were penetration.
+#   * limit_exceeded: dominated by the unavoidable joint_4 zero-start clamp (reset is all
+#     zeros but joint_4's safe floor is 2 deg), so it flagged ~100% of episodes.
+# The in-loop collector uses torch tensors but mirrors this exact logic.
+
+def finger_table_penetration(finger_z, over_table, table_top_z, margin_m):
+    """Footprint-conditioned tabletop penetration from the actual finger body world z.
+
+    finger_z: per-finger-body world z values (one per finger body).
+    over_table: per-finger-body bools; True iff that body's xy is within the table footprint.
+    Returns (min_clearance, penetrated). min_clearance = min(finger_z - table_top_z) over only
+    the finger bodies that are over the table (``+inf`` if none are), so a finger dipping below
+    the table plane while beside the table is NOT counted. penetrated = min_clearance < -margin_m.
+    """
+    clearances = [float(fz) - float(table_top_z) for fz, ot in zip(finger_z, over_table) if ot]
+    if not clearances:
+        return float("inf"), False
+    min_clearance = min(clearances)
+    return min_clearance, bool(min_clearance < -float(margin_m))
+
+
+def object_pushed_down(obj_z, rest_z, margin_m):
+    """True if any object is driven below its episode-start rest z by more than margin_m."""
+    return any((float(rz) - float(oz)) > float(margin_m) for oz, rz in zip(obj_z, rest_z))
+
+
+def refined_action_clip(jdes_deg, jclamped_deg, joint4_index, tol_deg, joint4_startup_tol_deg):
+    """Genuine commanded-action clipping for one control step, ignoring the joint_4 zero-start clamp.
+
+    jdes_deg / jclamped_deg: per-joint IK-desired vs safe-clamped angles (degrees) for one step.
+    The joint_4 lower-bound correction (clip magnitude <= joint4_startup_tol_deg) is ignored because
+    the all-zero reset starts joint_4 below its 2 deg safe floor and the first solves necessarily
+    nudge it up. Returns (clipped, max_clip_deg) over the non-ignored joints.
+    """
+    max_clip = 0.0
+    clipped = False
+    for idx, (d, c) in enumerate(zip(jdes_deg, jclamped_deg)):
+        mag = abs(float(d) - float(c))
+        if idx == int(joint4_index) and mag <= float(joint4_startup_tol_deg):
+            continue
+        if mag > max_clip:
+            max_clip = mag
+        if mag > float(tol_deg):
+            clipped = True
+    return clipped, max_clip
+
+
 def build_arg_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--config", default=str(CONFIG_DIR / "scene_openarm_dense_isaac_camera_v1.yaml"))
@@ -75,10 +126,44 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--substeps", type=int, default=12, help="physics steps per control step (match eval)")
     p.add_argument("--settle-steps", type=int, default=40)
     p.add_argument("--above-offset-m", type=float, default=0.12)
-    p.add_argument("--lift-offset-m", type=float, default=0.15)
+    p.add_argument(
+        "--grasp-z-offset-m",
+        type=float,
+        default=0.0,
+        help="offset added to the target object's grasp z before descend/close/lift waypoints",
+    )
+    p.add_argument("--lift-offset-m", type=float, default=0.05)
     p.add_argument("--lift-threshold-m", type=float, default=0.04)
     p.add_argument("--grasp-close-deg", type=float, default=0.0, help="gripper target at full close (deg, -65..0)")
+    p.add_argument(
+        "--max-gripper-close-deg",
+        type=float,
+        default=0.0,
+        help="upper gripper command cap; use -3 to prevent fully closed gripper commands",
+    )
     p.add_argument("--contact-eps-m", type=float, default=0.02, help="tcp-object distance counted as contact")
+    p.add_argument("--object-collision-margin-m", type=float, default=0.002)
+    p.add_argument("--table-collision-margin-m", type=float, default=0.005)
+    p.add_argument(
+        "--object-sweep-threshold-m",
+        type=float,
+        default=0.025,
+        help="reject episodes where any object slides this far on the table before lift",
+    )
+    # Per-episode object spawn jitter (defaults match the small-jitter contract).
+    p.add_argument("--jitter-x-m", type=float, default=0.005,
+                   help="uniform +/- x jitter applied to each object spawn (m)")
+    p.add_argument("--jitter-y-m", type=float, default=0.003,
+                   help="uniform +/- y jitter applied to each object spawn (m)")
+    # Better safety checks (replace the misleading tcp-clearance / limit_exceeded diagnostics).
+    p.add_argument("--finger-table-margin-m", type=float, default=0.003,
+                   help="reject if a finger body penetrates below the table top by more than this (m), over the footprint")
+    p.add_argument("--object-pushdown-margin-m", type=float, default=0.005,
+                   help="reject if any object is driven below its rest z by more than this (m)")
+    p.add_argument("--action-clip-tol-deg", type=float, default=1.0,
+                   help="genuine action-clip threshold (deg) for the refined unsafe-clip reject flag")
+    p.add_argument("--joint4-startup-tol-deg", type=float, default=3.0,
+                   help="ignore joint_4 lower-bound clamps up to this magnitude (the unavoidable zero-start correction)")
     # Target sampling weights, aligned to config object order [orange,red,green,blue].
     p.add_argument("--target-weights", default="2.5,1,1,1", help="comma weights for object sampling")
     p.add_argument("--drop-limit-exceeded", action="store_true", help="reject episodes that hit the limit clamp")
@@ -109,7 +194,20 @@ def main() -> int:
     instruction_for = {o["name"]: o["instruction"] for o in objs}
     spawn_for = {o["name"]: [float(v) for v in o["spawn_pose_m"]] for o in objs}
     bounds = config["scene"]["workspace_bounds_m"]
+    table_cfg = config["scene"]["table"]
+    table_size = [float(v) for v in table_cfg["size_m"]]
+    table_pose = [float(v) for v in table_cfg["pose_m"]]
+    table_top_z = table_pose[2] + table_size[2] / 2.0
+    table_x = (table_pose[0] - table_size[0] / 2.0, table_pose[0] + table_size[0] / 2.0)
+    table_y = (table_pose[1] - table_size[1] / 2.0, table_pose[1] + table_size[1] / 2.0)
     n_obj = len(obj_names)
+    object_contact_radii = []
+    for obj in objs:
+        if obj["shape"] == "sphere":
+            object_contact_radii.append(float(obj["radius_m"]))
+        else:
+            sx, sy, sz = [float(v) for v in obj["size_m"]]
+            object_contact_radii.append(math.sqrt(sx * sx + sy * sy + sz * sz) / 2.0)
 
     res = config["scene"]["camera"]["resolution"]
     if int(res[0]) != int(res[1]):
@@ -133,8 +231,17 @@ def main() -> int:
         ("hold", args.hold_steps),
     ]
     episode_len = sum(n for _, n in phase_plan)
+    effective_close_deg = min(float(args.grasp_close_deg), float(args.max_gripper_close_deg))
+    if effective_close_deg != float(args.grasp_close_deg):
+        print(
+            f"[dense] capping --grasp-close-deg {args.grasp_close_deg:.3f} to "
+            f"{effective_close_deg:.3f}",
+            file=sys.stderr,
+            flush=True,
+        )
     print(f"[dense] episode_len={episode_len} control steps, image={image_size}px, "
-          f"keep-success-only, drop_limit={args.drop_limit_exceeded}", file=sys.stderr, flush=True)
+          f"keep-success-only, drop_limit={args.drop_limit_exceeded}, "
+          f"gripper_close={effective_close_deg:.3f} deg", file=sys.stderr, flush=True)
 
     _isaac_paths()
     from isaaclab.app import AppLauncher
@@ -186,8 +293,20 @@ def main() -> int:
 
     arm_ids, _ = robot.find_joints([f"openarm_{side}_joint{i}" for i in range(1, 8)], preserve_order=True)
     finger_ids, _ = robot.find_joints(f"openarm_{side}_finger_joint.*")
+    inactive_side = "left" if side == "right" else "right"
+    inactive_arm_ids, _ = robot.find_joints(
+        [f"openarm_{inactive_side}_joint{i}" for i in range(1, 8)],
+        preserve_order=True,
+    )
+    inactive_finger_ids, _ = robot.find_joints(f"openarm_{inactive_side}_finger_joint.*")
     tcp_idx = robot.find_bodies(f"openarm_{side}_ee_tcp")[0][0]
     ee_jacobi_idx = tcp_idx - 1 if robot.is_fixed_base else tcp_idx
+    # Finger body ids for the footprint-conditioned tabletop penetration check.
+    finger_body_ids, finger_body_names = robot.find_bodies(f"openarm_{side}_.*finger")
+    if not finger_body_ids:
+        finger_body_ids, finger_body_names = robot.find_bodies(f"openarm_{side}_hand")
+    print(f"[dense] finger bodies for penetration check: {finger_body_names}", file=sys.stderr, flush=True)
+    joint4_idx = JOINT_NAMES.index("joint_4")
     ent = SceneEntityCfg("robot", joint_names=[f"openarm_{side}_joint{i}" for i in range(1, 8)],
                          body_names=[f"openarm_{side}_ee_tcp"])
     ent.resolve(scene)
@@ -203,10 +322,22 @@ def main() -> int:
     )
 
     open_m = gripper_deg_to_sim_finger_m(-65.0)
-    closed_m = gripper_deg_to_sim_finger_m(float(args.grasp_close_deg))
+    closed_m = gripper_deg_to_sim_finger_m(effective_close_deg)
+    object_radius_t = torch.tensor(object_contact_radii, device=device, dtype=torch.float32)
+
+    def lock_inactive_arm() -> None:
+        if inactive_arm_ids:
+            robot.set_joint_position_target(robot.data.default_joint_pos[:, inactive_arm_ids], joint_ids=inactive_arm_ids)
+        if inactive_finger_ids:
+            reset_gripper = float(config["robot"]["reset_pose_deg"][inactive_side].get("gripper", -65.0))
+            capped_gripper = min(reset_gripper, float(args.max_gripper_close_deg))
+            finger_m = gripper_deg_to_sim_finger_m(capped_gripper)
+            target = torch.full((N, len(inactive_finger_ids)), float(finger_m), device=device)
+            robot.set_joint_position_target(target, joint_ids=inactive_finger_ids)
 
     def step_phys(n: int, render_last: bool = True) -> None:
         for k in range(n):
+            lock_inactive_arm()
             scene.write_data_to_sim()
             sim.step(render=(render_last and k == n - 1))
             scene.update(sim_dt)
@@ -217,6 +348,45 @@ def main() -> int:
 
     def obj_pos_w() -> torch.Tensor:  # [N, n_obj, 3]
         return torch.stack([scene[name].data.root_pos_w for name in obj_names], dim=1)
+
+    def object_collision_state() -> tuple[torch.Tensor, torch.Tensor]:
+        pos = obj_pos_w()
+        flags = torch.zeros(N, dtype=torch.bool, device=device)
+        min_dist = torch.full((N,), float("inf"), device=device)
+        for i in range(n_obj):
+            for j in range(i + 1, n_obj):
+                dist = torch.linalg.norm(pos[:, i] - pos[:, j], dim=-1)
+                threshold = object_radius_t[i] + object_radius_t[j] + float(args.object_collision_margin_m)
+                flags |= dist < threshold
+                min_dist = torch.minimum(min_dist, dist)
+        return flags, min_dist
+
+    def gripper_table_collision_state() -> tuple[torch.Tensor, torch.Tensor]:
+        tcp_w = robot.data.body_pose_w[:, tcp_idx, 0:3]
+        over_table = (
+            (tcp_w[:, 0] >= table_x[0])
+            & (tcp_w[:, 0] <= table_x[1])
+            & (tcp_w[:, 1] >= table_y[0])
+            & (tcp_w[:, 1] <= table_y[1])
+        )
+        clearance = tcp_w[:, 2] - table_top_z
+        return over_table & (clearance < float(args.table_collision_margin_m)), clearance
+
+    def finger_table_state() -> tuple[torch.Tensor, torch.Tensor]:
+        """Footprint-conditioned tabletop penetration from the actual finger body world z.
+
+        Mirrors ``finger_table_penetration``: clearance is min(finger_z - table_top_z) over only
+        the finger bodies whose xy is within the table footprint (``+inf`` if none), so a finger
+        dipping below the table plane while beside the table is not counted as penetration.
+        """
+        fb = robot.data.body_pose_w[:, finger_body_ids, 0:3]  # [N, F, 3]
+        fx, fy, fz = fb[:, :, 0], fb[:, :, 1], fb[:, :, 2]
+        over = (fx >= table_x[0]) & (fx <= table_x[1]) & (fy >= table_y[0]) & (fy <= table_y[1])
+        clearance = fz - table_top_z  # [N, F]
+        clearance_over = torch.where(over, clearance, torch.full_like(clearance, float("inf")))
+        min_clear = clearance_over.min(dim=1).values  # [N]
+        penetrated = min_clear < -float(args.finger_table_margin_m)
+        return penetrated, min_clear
 
     def read_rgb() -> np.ndarray:
         """Current Isaac camera tensor for all envs as uint8 [N,H,W,3]."""
@@ -244,7 +414,7 @@ def main() -> int:
         jdes = ik.compute(ee_pos_b, ee_quat_b, jac, jpos)
         jclamped = torch.clamp(jdes, arm_lo, arm_hi)
         hit = (jdes != jclamped).any(dim=-1)
-        return jclamped, hit
+        return jclamped, hit, jdes
 
     def set_ik_command(target_w: torch.Tensor) -> None:
         ik.reset()
@@ -286,6 +456,12 @@ def main() -> int:
     kept_by_target: Counter = Counter()
     wrong_total = 0
     clamp_total = 0
+    object_collision_total = 0
+    gripper_table_collision_total = 0
+    object_sweep_total = 0
+    finger_penetration_total = 0
+    object_pushed_down_total = 0
+    refined_clip_total = 0
     saved_sample = False
 
     def gripper_schedule(phase: str, k: int, n: int) -> float:
@@ -307,8 +483,8 @@ def main() -> int:
             base = torch.tensor(spawn_for[name], device=device)
             jit = torch.zeros((N, 3), device=device)
             if args.randomize:
-                jx = torch.empty(N).uniform_(-0.015, 0.015, generator=rng)
-                jy = torch.empty(N).uniform_(-0.008, 0.008, generator=rng)
+                jx = torch.empty(N).uniform_(-float(args.jitter_x_m), float(args.jitter_x_m), generator=rng)
+                jy = torch.empty(N).uniform_(-float(args.jitter_y_m), float(args.jitter_y_m), generator=rng)
                 jit[:, 0] = jx.to(device)
                 jit[:, 1] = jy.to(device)
             local = base.unsqueeze(0) + jit
@@ -327,9 +503,12 @@ def main() -> int:
         target_idx = torch.multinomial(wtensor, N, replacement=True, generator=rng).to(device)
 
         ow = obj_pos_w()
-        baseline = ow[:, :, 2].clone()
+        baseline_pos = ow.clone()
+        baseline = baseline_pos[:, :, 2].clone()
+        baseline_xy = baseline_pos[:, :, 0:2].clone()
         tw = ow.gather(1, target_idx.view(-1, 1, 1).expand(-1, 1, 3)).squeeze(1)  # [N,3]
-        ox, oy, grasp_z = tw[:, 0], tw[:, 1], tw[:, 2]
+        ox, oy = tw[:, 0], tw[:, 1]
+        grasp_z = tw[:, 2] + float(args.grasp_z_offset_m)
         above = torch.stack([ox, oy, grasp_z + args.above_offset_m], dim=-1)
         descend = torch.stack([ox, oy, grasp_z], dim=-1)
         lift = torch.stack([ox, oy, grasp_z + args.lift_offset_m], dim=-1)
@@ -340,7 +519,44 @@ def main() -> int:
         action_buf = [[] for _ in range(N)]
         contact_steps = torch.zeros(N, device=device)
         clamp_hit = torch.zeros(N, dtype=torch.bool, device=device)
+        object_collision_hit = torch.zeros(N, dtype=torch.bool, device=device)
+        gripper_table_collision_hit = torch.zeros(N, dtype=torch.bool, device=device)
+        object_sweep_hit = torch.zeros(N, dtype=torch.bool, device=device)
+        min_object_distance = torch.full((N,), float("inf"), device=device)
+        min_tcp_table_clearance = torch.full((N,), float("inf"), device=device)
+        max_surface_sweep = torch.zeros(N, device=device)
+        # Authoritative new safety accumulators.
+        finger_penetration_hit = torch.zeros(N, dtype=torch.bool, device=device)
+        min_finger_table_clearance = torch.full((N,), float("inf"), device=device)
+        object_pushed_down_hit = torch.zeros(N, dtype=torch.bool, device=device)
+        refined_clip_hit = torch.zeros(N, dtype=torch.bool, device=device)
+        max_refined_clip_deg = torch.zeros(N, device=device)
         last_arm = robot.data.joint_pos[:, ent.joint_ids].clone()
+
+        def object_sweep_state() -> tuple[torch.Tensor, torch.Tensor]:
+            pos = obj_pos_w()
+            xy_delta = torch.linalg.norm(pos[:, :, 0:2] - baseline_xy, dim=-1)
+            still_on_table = (pos[:, :, 2] - baseline) < float(args.lift_threshold_m)
+            sweep = (xy_delta > float(args.object_sweep_threshold_m)) & still_on_table
+            return sweep.any(dim=-1), xy_delta.max(dim=-1).values
+
+        def object_pushdown_state() -> torch.Tensor:
+            z = obj_pos_w()[:, :, 2]  # [N, n_obj]
+            return ((baseline - z) > float(args.object_pushdown_margin_m)).any(dim=-1)
+
+        obj_hit, obj_dist = object_collision_state()
+        table_hit, tcp_clearance = gripper_table_collision_state()
+        sweep_hit, surface_sweep = object_sweep_state()
+        fp_hit, fp_clear = finger_table_state()
+        object_collision_hit |= obj_hit
+        gripper_table_collision_hit |= table_hit
+        object_sweep_hit |= sweep_hit
+        finger_penetration_hit |= fp_hit
+        object_pushed_down_hit |= object_pushdown_state()
+        min_object_distance = torch.minimum(min_object_distance, obj_dist)
+        min_tcp_table_clearance = torch.minimum(min_tcp_table_clearance, tcp_clearance)
+        min_finger_table_clearance = torch.minimum(min_finger_table_clearance, fp_clear)
+        max_surface_sweep = torch.maximum(max_surface_sweep, surface_sweep)
 
         phase_target = {"approach": above, "descend": descend, "close": descend, "lift": lift, "hold": lift}
         for phase, n_steps in phase_plan:
@@ -349,9 +565,20 @@ def main() -> int:
                 rgb = read_rgb()
                 state = read_state_deg()
                 if phase in ("approach", "descend", "lift"):
-                    jclamped, hit = ik_solve_clamped()
+                    jclamped, hit, jdes = ik_solve_clamped()
                     last_arm = jclamped
                     clamp_hit |= hit
+                    # Refined clip: genuine commanded-action clipping, ignoring the
+                    # unavoidable joint_4 zero-start lower-bound correction.
+                    clip_deg = torch.abs(jdes - jclamped) * 180.0 / math.pi  # [N,7]
+                    j4 = clip_deg[:, joint4_idx]
+                    clip_eff = clip_deg.clone()
+                    clip_eff[:, joint4_idx] = torch.where(
+                        j4 <= float(args.joint4_startup_tol_deg), torch.zeros_like(j4), j4
+                    )
+                    step_max_clip = clip_eff.max(dim=-1).values  # [N]
+                    refined_clip_hit |= step_max_clip > float(args.action_clip_tol_deg)
+                    max_refined_clip_deg = torch.maximum(max_refined_clip_deg, step_max_clip)
                 else:  # close, hold -> hold last arm target
                     jclamped = last_arm
                 gtarget_m = gripper_schedule(phase, k, n_steps)
@@ -371,6 +598,19 @@ def main() -> int:
                 robot.set_joint_position_target(jclamped, joint_ids=arm_ids)
                 set_gripper(gtarget_m)
                 step_phys(args.substeps, render_last=True)
+                obj_hit, obj_dist = object_collision_state()
+                table_hit, tcp_clearance = gripper_table_collision_state()
+                sweep_hit, surface_sweep = object_sweep_state()
+                fp_hit, fp_clear = finger_table_state()
+                object_collision_hit |= obj_hit
+                gripper_table_collision_hit |= table_hit
+                object_sweep_hit |= sweep_hit
+                finger_penetration_hit |= fp_hit
+                object_pushed_down_hit |= object_pushdown_state()
+                min_object_distance = torch.minimum(min_object_distance, obj_dist)
+                min_tcp_table_clearance = torch.minimum(min_tcp_table_clearance, tcp_clearance)
+                min_finger_table_clearance = torch.minimum(min_finger_table_clearance, fp_clear)
+                max_surface_sweep = torch.maximum(max_surface_sweep, surface_sweep)
 
         final = obj_pos_w()[:, :, 2]
         rises = final - baseline
@@ -386,9 +626,30 @@ def main() -> int:
             src_by_target[tname] += 1
             is_wrong = bool(wrong_any[e].item())
             is_clamp = bool(clamp_hit[e].item())
+            is_object_collision = bool(object_collision_hit[e].item())
+            is_gripper_table_collision = bool(gripper_table_collision_hit[e].item())
+            is_object_sweep = bool(object_sweep_hit[e].item())
+            is_finger_penetration = bool(finger_penetration_hit[e].item())
+            is_object_pushed_down = bool(object_pushed_down_hit[e].item())
+            is_refined_clip = bool(refined_clip_hit[e].item())
             wrong_total += int(is_wrong)
             clamp_total += int(is_clamp)
-            keep = bool(success[e].item()) and not is_wrong
+            object_collision_total += int(is_object_collision)
+            gripper_table_collision_total += int(is_gripper_table_collision)
+            object_sweep_total += int(is_object_sweep)
+            finger_penetration_total += int(is_finger_penetration)
+            object_pushed_down_total += int(is_object_pushed_down)
+            refined_clip_total += int(is_refined_clip)
+            keep = (
+                bool(success[e].item())
+                and not is_wrong
+                and not is_object_collision
+                and not is_gripper_table_collision
+                and not is_object_sweep
+                and not is_finger_penetration       # authoritative tabletop penetration
+                and not is_object_pushed_down        # object driven into the table
+                and not is_refined_clip              # genuine unsafe action clipping (joint_4 zero-start excluded)
+            )
             if args.drop_limit_exceeded and is_clamp:
                 keep = False
             if args.max_keep and kept >= args.max_keep:
@@ -412,9 +673,48 @@ def main() -> int:
                 "success_label": bool(success[e].item()),
                 "wrong_object_lifted": is_wrong,
                 "limit_exceeded": is_clamp,
+                "object_collision": is_object_collision,
+                "gripper_table_collision": is_gripper_table_collision,
+                "object_swept_or_slid": is_object_sweep,
+                "min_object_distance_m": round(float(min_object_distance[e]), 5),
+                "min_tcp_table_clearance_m": round(float(min_tcp_table_clearance[e]), 5),
+                "max_surface_sweep_m": round(float(max_surface_sweep[e]), 5),
+                # Authoritative new safety fields (replace the misleading tcp/limit diagnostics).
+                "min_finger_table_clearance_m": round(float(min_finger_table_clearance[e]), 5),
+                "tabletop_penetration": is_finger_penetration,
+                "object_pushed_down": is_object_pushed_down,
+                "refined_action_clip": is_refined_clip,
+                "max_refined_action_clip_deg": round(float(max_refined_clip_deg[e]), 4),
+                "finger_body_names": list(finger_body_names),
+                "substeps": int(args.substeps),
+                "jitter_x_m": round(float(args.jitter_x_m), 5),
+                "jitter_y_m": round(float(args.jitter_y_m), 5),
+                "gripper_cmd_min_deg": round(float(min(float(a[-1]) for a in action_buf[e])), 3),
+                "gripper_cmd_max_deg": round(float(max(float(a[-1]) for a in action_buf[e])), 3),
+                "gripper_close_cap_deg": round(float(args.max_gripper_close_deg), 3),
+                "grasp_close_deg": round(float(effective_close_deg), 3),
+                "grasp_z_offset_m": round(float(args.grasp_z_offset_m), 5),
+                "lift_offset_m": round(float(args.lift_offset_m), 5),
                 "state_trace_deg": [[round(float(v), 3) for v in s.tolist()] for s in state_buf[e]],
                 "action_trace_deg": [[round(float(v), 3) for v in a.tolist()] for a in action_buf[e]],
             }
+
+            if sample_dir is not None and not saved_sample:
+                saved_sample = True
+                sample_dir.mkdir(parents=True, exist_ok=True)
+                try:
+                    from PIL import Image  # noqa: PLC0415
+
+                    status = "kept" if keep else "failed"
+                    for t in (0, episode_len // 3, 2 * episode_len // 3, episode_len - 1):
+                        Image.fromarray(rgb_buf[e][t]).save(sample_dir / f"ep0_{status}_{tname}_step{t:02d}.png")
+                    meta["sample_frames"] = [
+                        str(sample_dir / f"ep0_{status}_{tname}_step{t:02d}.png")
+                        for t in (0, episode_len // 3, 2 * episode_len // 3, episode_len - 1)
+                    ]
+                except Exception as exc:  # pragma: no cover
+                    print(f"[dense] sample frame dump failed: {exc}", file=sys.stderr, flush=True)
+
             manifest_fh.write(json.dumps(meta) + "\n")
 
             if not keep:
@@ -429,16 +729,6 @@ def main() -> int:
             dataset.save_episode()
             kept += 1
             kept_by_target[tname] += 1
-
-            if sample_dir is not None and not saved_sample:
-                saved_sample = True
-                sample_dir.mkdir(parents=True, exist_ok=True)
-                try:
-                    from PIL import Image  # noqa: PLC0415
-                    for t in (0, episode_len // 3, 2 * episode_len // 3, episode_len - 1):
-                        Image.fromarray(rgb_buf[e][t]).save(sample_dir / f"ep0_{tname}_step{t:02d}.png")
-                except Exception as exc:  # pragma: no cover
-                    print(f"[dense] sample frame dump failed: {exc}", file=sys.stderr, flush=True)
 
         print(f"[dense] round {rnd+1}/{args.rounds}: source={source_total} kept={kept} "
               f"(round success={float(success.float().mean()):.3f})", file=sys.stderr, flush=True)
@@ -465,6 +755,12 @@ def main() -> int:
         f"| Kept successes | {kept} | {rate(kept):.3f} |",
         f"| Wrong-object lifts (source) | {wrong_total} | {rate(wrong_total):.3f} |",
         f"| Limit-clamp episodes (source) | {clamp_total} | {rate(clamp_total):.3f} |",
+        f"| Object-collision episodes (source) | {object_collision_total} | {rate(object_collision_total):.3f} |",
+        f"| Gripper/table collision episodes (source) | {gripper_table_collision_total} | {rate(gripper_table_collision_total):.3f} |",
+        f"| Object sweep/slide episodes (source) | {object_sweep_total} | {rate(object_sweep_total):.3f} |",
+        f"| Tabletop-penetration episodes (source, finger body) | {finger_penetration_total} | {rate(finger_penetration_total):.3f} |",
+        f"| Object-pushed-down episodes (source) | {object_pushed_down_total} | {rate(object_pushed_down_total):.3f} |",
+        f"| Refined-action-clip episodes (source) | {refined_clip_total} | {rate(refined_clip_total):.3f} |",
         "",
         "## Targets",
         "",
@@ -486,14 +782,27 @@ def main() -> int:
         "",
         "- `observation.state` is the measured joint state; `action` is the clamped IK command.",
         "- Frames are the real Isaac scene camera (not the placeholder renderer); they move across the episode.",
-        "- Only successful, correct-object lifts are kept; wrong-object lifts are rejected.",
+        "- Only successful, correct-object lifts are kept; wrong-object lifts, object collisions, gripper/table collisions, and object sweep/slide episodes are rejected.",
+        f"- Gripper close command is capped at `{effective_close_deg:.3f}` deg.",
+        f"- Lift waypoint is `{float(args.lift_offset_m):.3f}` m above the grasp waypoint.",
+        f"- Grasp z offset is `{float(args.grasp_z_offset_m):.3f}` m.",
     ]
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     print(json.dumps({
         "ok": True, "source_episodes": source_total, "kept": kept, "kept_rate": rate(kept),
-        "wrong_object": wrong_total, "limit_clamp": clamp_total, "image_size": image_size,
+        "wrong_object": wrong_total, "limit_clamp": clamp_total,
+        "object_collision": object_collision_total,
+        "gripper_table_collision": gripper_table_collision_total,
+        "object_sweep": object_sweep_total,
+        "tabletop_penetration": finger_penetration_total,
+        "object_pushed_down": object_pushed_down_total,
+        "refined_action_clip": refined_clip_total,
+        "grasp_close_deg": effective_close_deg,
+        "grasp_z_offset_m": args.grasp_z_offset_m,
+        "lift_offset_m": args.lift_offset_m,
+        "image_size": image_size,
         "episode_len": episode_len, "dataset_root": str(dataset_root), "repo_id": args.repo_id,
         "manifest": str(manifest_path), "report": str(report_path),
         "kept_by_target": dict(kept_by_target), "source_by_target": dict(src_by_target),

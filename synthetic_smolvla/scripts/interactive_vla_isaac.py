@@ -73,17 +73,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--viewer-eye-m",
         type=float,
         nargs=3,
-        default=[0.95, -0.85, 1.35],
+        default=None,
         metavar=("X", "Y", "Z"),
-        help="viewer-only starting camera eye in meters; does not change the model RGB camera",
+        help="viewer-only starting camera eye in meters; defaults to scene.camera.eye_m",
     )
     parser.add_argument(
         "--viewer-target-m",
         type=float,
         nargs=3,
-        default=[0.30, -0.16, 0.55],
+        default=None,
         metavar=("X", "Y", "Z"),
-        help="viewer-only starting camera target in meters; does not change the model RGB camera",
+        help="viewer-only starting camera target in meters; defaults to scene.camera.target_m",
     )
     parser.add_argument(
         "--policy-device",
@@ -174,6 +174,15 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="refuse real mirror targets with a larger arm-joint step delta",
     )
     parser.add_argument(
+        "--real-helper-max-rel-deg",
+        type=float,
+        default=None,
+        help=(
+            "OpenArmFollower max_relative_target sent to the helper. "
+            "Use a larger value for direct init while keeping --max-joint-delta-deg for VLA sampling."
+        ),
+    )
+    parser.add_argument(
         "--start-pose-max-joint-delta-deg",
         type=float,
         default=None,
@@ -232,6 +241,18 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default=0.3,
         help="seconds the real start pose must stay within tolerance before accepting tasks",
     )
+    parser.add_argument(
+        "--real-start-pose-samples",
+        type=int,
+        default=1,
+        help="number of sampled prepare_start targets for init; 1 means direct/default init",
+    )
+    parser.add_argument(
+        "--real-start-pose-duration-sec",
+        type=float,
+        default=None,
+        help="stream init targets for this many seconds, using --start-pose-rate-hz if set",
+    )
     parser.add_argument("--first-real-target-tolerance-deg", type=float, default=DEFAULT_FIRST_TARGET_TOLERANCE_DEG)
     parser.add_argument("--real-connect-retries", type=int, default=3)
     parser.add_argument("--real-connect-retry-delay-sec", type=float, default=1.5)
@@ -249,6 +270,7 @@ def _build_real_config(args: argparse.Namespace, *, side: str) -> RealMirrorConf
         max_joint_delta_deg=args.max_joint_delta_deg,
         watchdog_timeout_sec=args.watchdog_timeout_sec,
         disable_gripper_real=args.disable_gripper_real,
+        helper_max_relative_target_deg=args.real_helper_max_rel_deg,
         start_pose_max_joint_delta_deg=args.start_pose_max_joint_delta_deg,
         start_pose_gripper_max_delta_deg=args.start_pose_gripper_max_delta_deg,
         start_pose_rate_hz=args.start_pose_rate_hz,
@@ -261,6 +283,8 @@ def _build_real_config(args: argparse.Namespace, *, side: str) -> RealMirrorConf
         start_pose_tolerance_deg=args.real_start_pose_tolerance_deg,
         start_pose_timeout_sec=args.real_start_pose_timeout_sec,
         start_pose_hold_sec=args.real_start_pose_hold_sec,
+        start_pose_samples=args.real_start_pose_samples,
+        start_pose_duration_sec=args.real_start_pose_duration_sec,
         first_target_tolerance_deg=args.first_real_target_tolerance_deg,
         connect_retries=args.real_connect_retries,
         connect_retry_delay_sec=args.real_connect_retry_delay_sec,
@@ -447,7 +471,9 @@ def main() -> int:
     )
     sim = sim_utils.SimulationContext(sim_utils.SimulationCfg(dt=0.005, device=args.device))
     cam = config["scene"]["camera"]
-    sim.set_camera_view(eye=args.viewer_eye_m, target=args.viewer_target_m)
+    viewer_eye_m = args.viewer_eye_m if args.viewer_eye_m is not None else cam["eye_m"]
+    viewer_target_m = args.viewer_target_m if args.viewer_target_m is not None else cam["target_m"]
+    sim.set_camera_view(eye=viewer_eye_m, target=viewer_target_m)
     scene = InteractiveScene(scene_cls(num_envs=1, env_spacing=2.0))
     sim.reset()
     scene.reset()

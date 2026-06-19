@@ -1,0 +1,29 @@
+training:
+  dataset: synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_routed_v2_extra_right_plus_start20_1500_direct_v1
+  checkpoint_dir: synthetic_smolvla/checkpoints/smolvla_openarm_real_table_zero_lift5cm_v2_extra_right_plus_start20_1500_direct_from010_state8_lr3e5
+  policy: smolvla
+  policy_path: synthetic_smolvla/checkpoints/smolvla_openarm_real_table_zero_lift5cm_routed_v2_from020_lr3e5/checkpoints/010000/pretrained_model_typed
+  device: cuda
+  batch_size: 1
+  steps: 15000
+  save_freq: 3000
+  # Critical stale-shape fix: the source checkpoint config still says
+  # observation.state is [6]. Clear pretrained input_features at launch so
+  # LeRobot infers observation.state [8], action [8], and only camera1 from the
+  # clean dataset metadata.
+  infer_input_features_from_dataset: true
+  # Dataset contract:
+  # - Simulation only, real Isaac robot-view camera frames.
+  # - All 974 routed_v2_extra_right clean successful episodes plus the first
+  #   526 orange/red start-focused 20-frame prefixes (1500 complete episodes).
+  # - Lift waypoint is 5 cm above grasp waypoint.
+  # - Gripper command cap is -3 deg; no -2 deg fallback in this run.
+  # - Orange/red use the documented right-arm fallback; green/blue are left-arm.
+  # - Rejected source episodes include object collisions, gripper/table contact,
+  #   object sweep/slide, wrong-object lifts, and failed target lifts.
+  n_action_steps: 10
+  optimizer_lr: 0.00003
+  scheduler_warmup_steps: 500
+  scheduler_decay_steps: 15000
+  scheduler_decay_lr: 0.0000025
+  run_mode: preflight_only

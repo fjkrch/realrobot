@@ -58,6 +58,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--lift-threshold-m", type=float, default=0.04)
     parser.add_argument("--jitter-x-m", type=float, default=0.015)
     parser.add_argument("--jitter-y-m", type=float, default=0.008)
+    parser.add_argument(
+        "--target-filter",
+        default="",
+        help="comma-separated object names to request as targets; all config objects remain in the scene for wrong-object checks",
+    )
+    parser.add_argument(
+        "--max-gripper-close-deg",
+        type=float,
+        default=0.0,
+        help="upper gripper command cap; use -3 to prevent fully closed gripper commands",
+    )
     parser.add_argument("--record-action-trace", action="store_true")
     # The corrected pipeline trains on REAL Isaac camera frames, so eval must feed
     # the same real camera (captured per step). --placeholder-camera reverts to the
@@ -183,6 +194,7 @@ def write_report(
             "- Success means the requested target object rose above the lift threshold.",
             "- Wrong-object lift is measured from non-target object rises.",
             "- RGB is the real Isaac scene camera captured per step (default), matching the dense training dataset.",
+            "- Policy gripper commands are capped by `--max-gripper-close-deg` before simulation.",
         ]
     )
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -195,7 +207,17 @@ def main() -> int:
     validate_scene_config(config)
 
     side = config["scene"].get("active_arm", "right")
-    object_names = [obj["name"] for obj in config["objects"]]
+    all_object_names = [obj["name"] for obj in config["objects"]]
+    if args.target_filter.strip():
+        allowed = {name.strip() for name in args.target_filter.split(",") if name.strip()}
+        unknown = sorted(allowed.difference(all_object_names))
+        if unknown:
+            raise SystemExit(f"Unknown --target-filter object(s): {unknown}; known={all_object_names}")
+        object_names = [name for name in all_object_names if name in allowed]
+    else:
+        object_names = list(all_object_names)
+    if not object_names:
+        raise SystemExit("--target-filter selected no objects")
     instruction_for = {obj["name"]: obj["instruction"] for obj in config["objects"]}
 
     ckpt = patch_checkpoint(_abs(args.checkpoint))
@@ -254,6 +276,12 @@ def main() -> int:
     robot = scene["robot"]
     arm_ids, _ = robot.find_joints([f"openarm_{side}_joint{i}" for i in range(1, 8)], preserve_order=True)
     finger_ids, _ = robot.find_joints(f"openarm_{side}_finger_joint.*")
+    inactive_side = "left" if side == "right" else "right"
+    inactive_arm_ids, _ = robot.find_joints(
+        [f"openarm_{inactive_side}_joint{i}" for i in range(1, 8)],
+        preserve_order=True,
+    )
+    inactive_finger_ids, _ = robot.find_joints(f"openarm_{inactive_side}_finger_joint.*")
 
     # Real Isaac camera (matches the dense dataset) or legacy placeholder renderer.
     scene_camera = scene["camera"]
@@ -294,15 +322,27 @@ def main() -> int:
             asset.write_root_pose_to_sim(root[:, :7])
             asset.write_root_velocity_to_sim(root[:, 7:])
 
+    def lock_inactive_arm() -> None:
+        if inactive_arm_ids:
+            robot.set_joint_position_target(robot.data.default_joint_pos[:, inactive_arm_ids], joint_ids=inactive_arm_ids)
+        if inactive_finger_ids:
+            reset_gripper = float(config["robot"]["reset_pose_deg"][inactive_side].get("gripper", -65.0))
+            capped_gripper = min(reset_gripper, float(args.max_gripper_close_deg))
+            fm = gripper_deg_to_sim_finger_m(capped_gripper)
+            fingers = torch.full((1, len(inactive_finger_ids)), float(fm), device=robot.device, dtype=torch.float32)
+            robot.set_joint_position_target(fingers, joint_ids=inactive_finger_ids)
+
     def apply(state8: np.ndarray, n: int) -> None:
         arm = torch.tensor(
             [[float(np.radians(state8[i])) for i in range(7)]],
             device=robot.device,
             dtype=torch.float32,
         )
-        fm = gripper_deg_to_sim_finger_m(float(state8[7]))
+        capped_gripper = min(float(state8[7]), float(args.max_gripper_close_deg))
+        fm = gripper_deg_to_sim_finger_m(capped_gripper)
         fingers = torch.full((1, len(finger_ids)), float(fm), device=robot.device, dtype=torch.float32)
         for _ in range(n):
+            lock_inactive_arm()
             robot.set_joint_position_target(arm, joint_ids=arm_ids)
             robot.set_joint_position_target(fingers, joint_ids=finger_ids)
             scene.write_data_to_sim()
@@ -342,14 +382,14 @@ def main() -> int:
             image_record = {
                 "target_object": target,
                 "object_poses_m": poses,
-                "visible_objects": object_names,
+                "visible_objects": all_object_names,
             }
 
             robot.write_joint_state_to_sim(robot.data.default_joint_pos, robot.data.default_joint_vel)
             robot.reset()
             place_objects(poses)
             apply(reset_state, args.settle_steps)
-            baseline = {name: object_z(name) for name in object_names}
+            baseline = {name: object_z(name) for name in all_object_names}
 
             def current_image():
                 if args.real_camera:
@@ -376,7 +416,8 @@ def main() -> int:
                 raw = raw_np.reshape(-1, raw_np.shape[-1])[0]
                 arm_raw = {JOINT_NAMES[i]: float(raw[i]) for i in range(7)}
                 arm_clamped = clamp_joint_targets(side, arm_raw)
-                grip = clamp(float(raw[7]), *SAFE_GRIPPER_LIMIT_DEG)
+                gripper_high = min(SAFE_GRIPPER_LIMIT_DEG[1], float(args.max_gripper_close_deg))
+                grip = clamp(float(raw[7]), SAFE_GRIPPER_LIMIT_DEG[0], gripper_high)
                 if any(abs(arm_clamped[j] - arm_raw[j]) > 1e-5 for j in JOINT_NAMES):
                     clamp_events += 1
                 if abs(grip - float(raw[7])) > 1e-5:
@@ -395,8 +436,8 @@ def main() -> int:
                 image = current_image()
                 final_command = command.copy()
 
-            final_z = {name: object_z(name) for name in object_names}
-            rises = {name: final_z[name] - baseline[name] for name in object_names}
+            final_z = {name: object_z(name) for name in all_object_names}
+            rises = {name: final_z[name] - baseline[name] for name in all_object_names}
             target_rise = rises[target]
             success = target_rise > args.lift_threshold_m
             wrong = any(rise > args.lift_threshold_m for name, rise in rises.items() if name != target)
@@ -409,13 +450,14 @@ def main() -> int:
                 "arm_side": side,
                 "randomized": True,
                 "all_objects_visible": True,
-                "visible_objects": list(object_names),
+                "visible_objects": list(all_object_names),
                 "object_poses_m": {name: [round(float(v), 5) for v in pose] for name, pose in poses.items()},
                 "target_rise_m": round(float(target_rise), 5),
                 "object_rises_m": {name: round(float(rise), 5) for name, rise in rises.items()},
                 "success_label": bool(success),
                 "wrong_object_lifted": bool(wrong),
                 "limit_clamp_events": int(clamp_events),
+                "max_gripper_close_deg": round(float(args.max_gripper_close_deg), 3),
                 "final_action_deg": [round(float(v), 3) for v in final_command.tolist()],
                 "final_observed_state_deg": [round(float(v), 3) for v in state.tolist()],
             }

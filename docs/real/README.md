@@ -244,10 +244,12 @@ python3 synthetic_smolvla/scripts/replay_openarm_zero_then_start_trajectory.py \
   --enable-gripper-real \
   --replay-rate-hz 25.0 \
   --max-joint-delta-deg 1.0 \
+  --real-helper-max-rel-deg 90.0 \
   --zero-stage-sec 8.0 \
   --real-start-pose-timeout-sec 120.0 \
   --real-start-pose-tolerance-deg 5.0 \
   --real-start-pose-hold-sec 0.05 \
+  --real-start-pose-samples 5 \
   --watchdog-timeout-sec 2.0 \
   --hold-interval-sec 0.03 \
   --replay-log "${UPSAMPLED_TRAJ%.jsonl}_zero_start_real_replay_25hz_log.jsonl"
@@ -271,17 +273,23 @@ python3 synthetic_smolvla/scripts/replay_openarm_zero_then_start_trajectory.py \
   --enable-gripper-real \
   --replay-rate-hz 25.0 \
   --max-joint-delta-deg 1.0 \
+  --real-helper-max-rel-deg 90.0 \
   --trajectory-max-joint-delta-deg 13.0 \
   --zero-stage-sec 8.0 \
   --real-start-pose-timeout-sec 120.0 \
   --real-start-pose-tolerance-deg 5.0 \
   --real-start-pose-hold-sec 0.05 \
+  --real-start-pose-samples 5 \
   --audit-output-json "${FIXED10_TRAJ%.jsonl}_audit.json"
 ```
 
 The fixed-10 file has exactly 10 saved samples per raw VLA command. If the raw
 VLA has a large jump, the real mirror still inserts internal 1-degree safety
 substeps before sending to the helper.
+The `--real-start-pose-samples 5` flag splits init/start preparation into 5
+sampled OpenArm `prepare_start` targets. The `--real-helper-max-rel-deg 90.0`
+flag prevents each init sample from creeping at the small VLA sampling delta;
+VLA replay still uses `--max-joint-delta-deg`.
 
 Zero pose only, using the same guarded default OpenArm position method:
 

@@ -62,6 +62,18 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--max-joint-delta-deg", type=float, default=1.0)
     parser.add_argument(
+        "--real-helper-max-rel-deg",
+        type=float,
+        default=None,
+        help="OpenArmFollower max_relative_target sent to the helper",
+    )
+    parser.add_argument(
+        "--start-pose-rate-hz",
+        type=float,
+        default=None,
+        help="send rate for timed init streaming; default uses 1 Hz in this prepare-only tool",
+    )
+    parser.add_argument(
         "--zero-stage-sec",
         type=float,
         default=8.0,
@@ -102,6 +114,18 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default=0.3,
         help="seconds the configured start pose must stay within tolerance before success",
     )
+    parser.add_argument(
+        "--real-start-pose-samples",
+        type=int,
+        default=1,
+        help="number of sampled prepare_start targets for init; 1 means direct/default init",
+    )
+    parser.add_argument(
+        "--real-start-pose-duration-sec",
+        type=float,
+        default=None,
+        help="stream init targets for this many seconds, using --start-pose-rate-hz if set",
+    )
     parser.add_argument("--real-connect-retries", type=int, default=3)
     parser.add_argument("--real-connect-retry-delay-sec", type=float, default=1.5)
     parser.add_argument(
@@ -130,6 +154,8 @@ def _build_real_config(args: argparse.Namespace, *, side: str) -> RealMirrorConf
         max_joint_delta_deg=args.max_joint_delta_deg,
         watchdog_timeout_sec=args.watchdog_timeout_sec,
         disable_gripper_real=args.disable_gripper_real,
+        helper_max_relative_target_deg=args.real_helper_max_rel_deg,
+        start_pose_rate_hz=args.start_pose_rate_hz,
         host=args.real_host,
         user=args.real_user,
         repo=args.real_repo,
@@ -139,6 +165,8 @@ def _build_real_config(args: argparse.Namespace, *, side: str) -> RealMirrorConf
         start_pose_tolerance_deg=args.real_start_pose_tolerance_deg,
         start_pose_timeout_sec=args.real_start_pose_timeout_sec,
         start_pose_hold_sec=args.real_start_pose_hold_sec,
+        start_pose_samples=args.real_start_pose_samples,
+        start_pose_duration_sec=args.real_start_pose_duration_sec,
         connect_retries=args.real_connect_retries,
         connect_retry_delay_sec=args.real_connect_retry_delay_sec,
         hold_interval_sec=args.hold_interval_sec,

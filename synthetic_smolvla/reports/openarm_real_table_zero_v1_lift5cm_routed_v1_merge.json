@@ -1,0 +1,39 @@
+{
+  "inputs": [
+    {
+      "episodes": 128,
+      "frames": 12800,
+      "repo_id": "local/openarm_real_table_zero_v1_lift5cm_orange_right_m3",
+      "root": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_orange_right_m3"
+    },
+    {
+      "episodes": 127,
+      "frames": 12700,
+      "repo_id": "local/openarm_real_table_zero_v1_lift5cm_red_right_m3",
+      "root": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_red_right_m3"
+    },
+    {
+      "episodes": 92,
+      "frames": 9200,
+      "repo_id": "local/openarm_real_table_zero_v1_lift5cm_green_left_zp01_m3",
+      "root": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_green_left_zp01_m3"
+    },
+    {
+      "episodes": 122,
+      "frames": 12200,
+      "repo_id": "local/openarm_real_table_zero_v1_lift5cm_blue_left_m3",
+      "root": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_blue_left_m3"
+    }
+  ],
+  "ok": true,
+  "output_root": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_routed_v1",
+  "repo_id": "local/openarm_real_table_zero_v1_lift5cm_routed_v1",
+  "task_frame_counts": {
+    "pick up the blue cube": 12200,
+    "pick up the green cube": 9200,
+    "pick up the orange ball": 12800,
+    "pick up the red cube": 12700
+  },
+  "total_episodes": 469,
+  "total_frames": 46900
+}

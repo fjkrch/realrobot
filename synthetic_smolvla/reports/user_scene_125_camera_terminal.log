@@ -1,0 +1,111 @@
+[3gH    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H   [INFO] Using python from: /home/chyanin/miniconda3/envs/env_isaaclab/bin/python
+[openarm_scene] launching Isaac app
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /home/chyanin/IsaacLab/apps/isaaclab.python.headless.rendering.kit
+Loading user config located at: '/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260618_205747.log
+2026-06-18T13:57:47Z [3ms] [Warning] [omni.ext.plugin] [ext: hsi_pregrasp_refusal] Extensions config 'extension.toml' doesn't exist '/home/chyanin/IsaacLab/source/hsi_pregrasp_refusal' or '/home/chyanin/IsaacLab/source/hsi_pregrasp_refusal/config'
+2026-06-18T13:57:47Z [496ms] [Warning] [gpu.foundation.plugin] Skipping unsupported non-NVIDIA GPU: AMD Radeon 780M Graphics (RADV PHOENIX)
+2026-06-18T13:57:47Z [496ms] [Warning] [gpu.foundation.plugin] Skipping unsupported non-NVIDIA GPU: AMD Radeon 780M Graphics (RADV PHOENIX)
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.159.03    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 4060 Laptop.. | Yes: 0 |     | 8188    MB | 10de      | 0          |
+|     |                                  |        |     |            | 28e0      | 78564eae.. |
+|     |                                  |        |     |            | 1         |            |
+|---------------------------------------------------------------------------------------------|
+| 1   | AMD Radeon 780M Graphics (RADV.. |        |     | 5396    MB | 1002      | 0          |
+|     |                                  |        |     |            | 15bf      | 00000000.. |
+|     |                                  |        |     |            | 6         |            |
+|=============================================================================================|
+| OS: 24.04.3 LTS (Noble Numbat) ubuntu, Version: 24.04.3, Kernel: 6.17.0-35-generic
+| XServer Vendor: The X.Org Foundation, XServer Version: 12101011 (1.21.1.11)
+| Processor: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+| Cores: 8 | Logical Cores: 16
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 15165 | Free Memory: 10516
+| Total Page/Swap (MB): 4095 | Free Page/Swap: 2621
+|---------------------------------------------------------------------------------------------|
+2026-06-18T13:57:48Z [811ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2026-06-18T13:57:48Z [811ms] [Warning] [gpu.foundation.plugin] Detected IOMMU is enabled. Running CUDA peer-to-peer bandwidth and latency validation.
+Unidirectional P2P=Enabled Bandwidth (P2P Writes) Matrix (GB/s)
+   D\D     0 
+     0 197.34 
+P2P=Enabled Latency (P2P Writes) Matrix (us)
+   GPU     0 
+     0   1.61 
+
+   CPU     0 
+     0   2.14 
+2026-06-18T13:57:48Z [1,590ms] [Warning] [omni.log] Source: omni.hydra was already registered.
+2026-06-18T13:57:49Z [1,830ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-06-18T13:57:49Z [1,845ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+2026-06-18T13:57:50Z [3,335ms] [Warning] [pxr.Semantics] pxr.Semantics is deprecated - please use Semantics instead
+2026-06-18T13:57:50Z [3,436ms] [Warning] [omni.graph.core.plugin] Found duplicate of category 'Replicator' - was 'Annotators', adding 'Fabric Reader'
+2026-06-18T13:57:50Z [3,436ms] [Warning] [omni.graph.core.plugin] Category 'Replicator' not accepted on node type 'omni.replicator.core.FabricReader' in extension 'omni.replicator.core'
+2026-06-18T13:57:50Z [3,437ms] [Warning] [omni.replicator.core.scripts.extension] No material configuration file, adding configuration to material settings directly.
+2026-06-18T13:57:54Z [6,636ms] [Warning] [omni.fabric.plugin] Warning: attribute viewportHandle not found for bucket id 7
+
+[openarm_scene] importing Isaac Lab APIs
+[openarm_scene] creating simulation context
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-06-18_20-57-54.log[0m
+[36m======================================================================================[0m
+
+[33m20:57:54 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[openarm_scene] creating interactive scene
+[openarm_scene] resetting sim
+[33m20:57:57 [articulation.py] WARNING: Not all actuators are configured! Total number of actuated joints not equal to number of joints available: 18 != 22.[0m
+2026-06-18T13:57:57Z [10,459ms] [Warning] [omni.fabric.plugin] getAttributeCount called on non-existent path /World/envs/env_0/Robot/openarm_right_right_finger/collisions/openarm_right_right_finger_collision
+2026-06-18T13:57:57Z [10,459ms] [Warning] [omni.fabric.plugin] getTypes called on non-existent path /World/envs/env_0/Robot/openarm_right_right_finger/collisions/openarm_right_right_finger_collision
+[openarm_scene] resetting scene
+[openarm_scene] stepping simulation
+2026-06-18T13:58:00Z [13,094ms] [Warning] [carb] Client gpu.foundation.plugin has acquired [gpu::unstable::IMemoryBudgetManagerFactory v0.1] 100 times. Consider accessing this interface with carb::getCachedInterface() (Performance warning)
+[openarm_scene] reading camera
+{
+  "ok": true,
+  "manifest": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/user_scene_125_camera_manifest.json",
+  "objects": 4,
+  "status": "isaac_scene_launched",
+  "isaac": {
+    "steps": 120,
+    "objects": {
+      "orange_ball": [
+        0.6800000071525574,
+        -0.23999999463558197,
+        0.7700000405311584
+      ],
+      "red_cube": [
+        0.6800000071525574,
+        -0.07999999821186066,
+        0.7642642259597778
+      ],
+      "green_cube": [
+        0.6800000071525574,
+        0.07999999821186066,
+        0.7642642259597778
+      ],
+      "blue_cube": [
+        0.6800000071525574,
+        0.23999999463558197,
+        0.7642642259597778
+      ]
+    },
+    "camera_rgb_shape": [
+      1,
+      720,
+      1280,
+      3
+    ],
+    "camera_rgb_path": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/user_scene_125_camera_rgb.ppm",
+    "headless": true,
+    "device": "cuda:0"
+  }
+}
+[openarm_scene] closing Isaac app

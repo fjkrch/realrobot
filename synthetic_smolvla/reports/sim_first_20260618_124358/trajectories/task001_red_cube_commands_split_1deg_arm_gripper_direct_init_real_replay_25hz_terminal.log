@@ -1,0 +1,38 @@
+{
+  "clamp_events": 0,
+  "delta_check_includes_gripper": true,
+  "errors": [],
+  "expected_steps": null,
+  "first_target_delta_from_start_deg": 0.914411,
+  "first_target_tolerance_deg": 15.0,
+  "gripper_sent_to_real": true,
+  "max_allowed_arm_delta_deg": 1.0,
+  "max_allowed_checked_delta_deg": 1.0,
+  "max_observed_arm_delta_deg": 0.999262,
+  "max_observed_checked_delta_deg": 0.999262,
+  "ok": true,
+  "real_gripper_disabled": false,
+  "records": 539,
+  "side": "right",
+  "trajectory": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/sim_first_20260618_124358/trajectories/task001_red_cube_commands_split_1deg_arm_gripper.jsonl"
+}
+[replay-openarm] real helper ready.
+{
+  "real_gripper_disabled": false,
+  "real_side": "right",
+  "real_state_deg": [
+    -0.14207,
+    -0.16393,
+    -0.09836,
+    2.1092,
+    0.12021,
+    0.01093,
+    -0.01093,
+    -4.46974
+  ]
+}
+[replay-openarm] moving real arm to configured start pose.
+[replay-openarm] real start-pose audit passed: {"errors_deg": {"gripper": 0.12275, "joint_1": 1.6502, "joint_2": 1.93524, "joint_3": 0.90706, "joint_4": 1.54886, "joint_5": 1.01635, "joint_6": 0.59493, "joint_7": 4.1856}, "max_error_deg": 4.1856}
+[replay-openarm] replaying 539 saved commands.
+[replay-openarm] replay finished; holding final pose. Type q when ready to release/exit, reset to return to start pose, or hold to keep holding.
+Replay finished and holding. Type reset, hold, or q: 

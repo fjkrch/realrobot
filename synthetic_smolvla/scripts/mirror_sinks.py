@@ -228,6 +228,7 @@ class RealMirrorConfig:
     max_joint_delta_deg: float
     watchdog_timeout_sec: float
     disable_gripper_real: bool = True
+    helper_max_relative_target_deg: float | None = None
     start_pose_max_joint_delta_deg: float | None = None
     start_pose_gripper_max_delta_deg: float | None = None
     start_pose_rate_hz: float | None = None
@@ -240,6 +241,8 @@ class RealMirrorConfig:
     start_pose_tolerance_deg: float = DEFAULT_START_POSE_TOLERANCE_DEG
     start_pose_timeout_sec: float = 25.0
     start_pose_hold_sec: float = 0.3
+    start_pose_samples: int = 1
+    start_pose_duration_sec: float | None = None
     first_target_tolerance_deg: float = DEFAULT_FIRST_TARGET_TOLERANCE_DEG
     connect_retries: int = 3
     connect_retry_delay_sec: float = 1.5
@@ -257,6 +260,8 @@ class RealMirrorConfig:
             raise MirrorSafetyError("--mirror-rate-hz must be positive.")
         if self.max_joint_delta_deg <= 0:
             raise MirrorSafetyError("--max-joint-delta-deg must be positive.")
+        if self.helper_max_relative_target_deg is not None and self.helper_max_relative_target_deg <= 0:
+            raise MirrorSafetyError("--real-helper-max-rel-deg must be positive.")
         if self.start_pose_max_joint_delta_deg is not None and self.start_pose_max_joint_delta_deg <= 0:
             raise MirrorSafetyError("--start-pose-max-joint-delta-deg must be positive.")
         if self.start_pose_gripper_max_delta_deg is not None and self.start_pose_gripper_max_delta_deg <= 0:
@@ -267,6 +272,10 @@ class RealMirrorConfig:
             raise MirrorSafetyError("--real-start-pose-timeout-sec must be positive.")
         if self.start_pose_hold_sec < 0:
             raise MirrorSafetyError("--real-start-pose-hold-sec cannot be negative.")
+        if self.start_pose_samples < 1:
+            raise MirrorSafetyError("--real-start-pose-samples must be at least 1.")
+        if self.start_pose_duration_sec is not None and self.start_pose_duration_sec <= 0:
+            raise MirrorSafetyError("--real-start-pose-duration-sec must be positive.")
         if self.watchdog_timeout_sec <= 0:
             raise MirrorSafetyError("--watchdog-timeout-sec must be positive.")
         if self.hold_interval_sec <= 0:
@@ -368,7 +377,7 @@ class RealMirrorSink:
             "--real-confirm",
             self.config.confirm,
             "--max-rel",
-            str(self.config.max_joint_delta_deg),
+            str(self._helper_max_relative_target_deg()),
             "--max-joint-delta-deg",
             str(self.config.max_joint_delta_deg),
             "--watchdog-timeout-sec",
@@ -437,10 +446,130 @@ class RealMirrorSink:
         return [float(value) for value in self._latest_state_deg]
 
     def prepare_start_pose(self, start_pose_deg: list[float]) -> dict[str, Any]:
+        if self.config.start_pose_duration_sec is not None:
+            return self.prepare_start_pose_over_duration(start_pose_deg, duration_sec=self.config.start_pose_duration_sec)
+
         target = clamp_command_deg(self.config.side, start_pose_deg).command_deg
         self.stop_keepalive()
         include_gripper = not self.config.disable_gripper_real
+        sampled_results: list[dict[str, Any]] = []
 
+        targets = [target]
+        if self.config.start_pose_samples > 1:
+            current_state = self.read_state()
+            targets = self._fixed_start_pose_samples(current_state, target, samples=self.config.start_pose_samples)
+
+        for sample_index, sample_target in enumerate(targets, start=1):
+            response, sample_summary = self._prepare_start_target(
+                sample_target,
+                include_gripper=include_gripper,
+                sample_index=sample_index,
+                sample_count=len(targets),
+            )
+            sampled_results.append(
+                {
+                    "sample_index": sample_index,
+                    "sample_count": len(targets),
+                    "event": response.get("event", "prepared_start"),
+                    "max_error_deg": sample_summary["max_error_deg"],
+                    "target_deg": [round(float(value), 6) for value in sample_target],
+                }
+            )
+
+        assert self._latest_state_deg is not None
+        summary = arm_error_summary(target, self._latest_state_deg, include_gripper=include_gripper)
+        if float(summary["max_error_deg"]) > self.config.start_pose_tolerance_deg:
+            raise MirrorSafetyError(
+                "Real start pose not reached after sampled preparation: "
+                f"max_error={summary['max_error_deg']:.3f} deg, "
+                f"tolerance={self.config.start_pose_tolerance_deg:.3f} deg."
+            )
+        self._last_target_deg = target
+        self._first_target_checked = False
+        self._prepared = True
+        self.start_keepalive()
+        return {
+            "ok": True,
+            "event": "prepared_start",
+            "state_deg": self._latest_state_deg,
+            "max_error_deg": summary["max_error_deg"],
+            "gripper_sent_to_real": include_gripper,
+            "start_pose_method": "helper_prepare_start_sampled"
+            if self.config.start_pose_samples > 1
+            else "helper_prepare_start",
+            "start_pose_samples": self.config.start_pose_samples,
+            "sampled_results": sampled_results,
+        }
+
+    def prepare_start_pose_over_duration(self, start_pose_deg: list[float], *, duration_sec: float) -> dict[str, Any]:
+        target = clamp_command_deg(self.config.side, start_pose_deg).command_deg
+        self.stop_keepalive()
+        include_gripper = not self.config.disable_gripper_real
+        current_state = self.read_state()
+        start_for_commands = self._last_target_deg if self._last_target_deg is not None else current_state
+        rate_hz = self._start_pose_rate_hz()
+        samples = max(1, int(math.ceil(duration_sec * rate_hz)))
+        max_delta = max_abs_target_delta_deg(
+            target,
+            start_for_commands,
+            include_gripper=include_gripper,
+        )
+        max_sample_delta = max_delta / samples
+        if max_sample_delta > self.config.max_joint_delta_deg:
+            raise MirrorSafetyError(
+                "Init duration is too short for the configured delta guard: "
+                f"{max_sample_delta:.3f} deg/sample > {self.config.max_joint_delta_deg:.3f} deg. "
+                "Increase --real-start-pose-duration-sec, increase --replay-rate-hz, "
+                "or use a larger --max-joint-delta-deg."
+            )
+
+        for step_index, intermediate in enumerate(
+            self._fixed_start_pose_samples(start_for_commands, target, samples=samples),
+            start=1,
+        ):
+            response = self._send_target(
+                intermediate,
+                CommandContext(task_index=None, step_index=step_index, typed_task="prepare_start_pose_duration"),
+                rate_hz=rate_hz,
+            )
+            if isinstance(response.get("state_deg"), list) and len(response["state_deg"]) == 8:
+                self._latest_state_deg = [float(value) for value in response["state_deg"]]
+            self._last_target_deg = intermediate
+
+        final_state = self.read_state()
+        self._latest_state_deg = [float(value) for value in final_state]
+        summary = arm_error_summary(target, self._latest_state_deg, include_gripper=include_gripper)
+        if float(summary["max_error_deg"]) > self.config.start_pose_tolerance_deg:
+            raise MirrorSafetyError(
+                "Real start pose not reached after timed preparation: "
+                f"max_error={summary['max_error_deg']:.3f} deg, "
+                f"tolerance={self.config.start_pose_tolerance_deg:.3f} deg."
+            )
+        self._last_target_deg = target
+        self._first_target_checked = False
+        self._prepared = True
+        self.start_keepalive()
+        return {
+            "ok": True,
+            "event": "prepared_start_timed",
+            "state_deg": self._latest_state_deg,
+            "max_error_deg": summary["max_error_deg"],
+            "gripper_sent_to_real": include_gripper,
+            "start_pose_method": "timed_target_stream",
+            "start_pose_duration_sec": float(duration_sec),
+            "start_pose_samples": samples,
+            "rate_hz": rate_hz,
+            "max_sample_delta_deg": round(float(max_sample_delta), 6),
+        }
+
+    def _prepare_start_target(
+        self,
+        target: list[float],
+        *,
+        include_gripper: bool,
+        sample_index: int,
+        sample_count: int,
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
         response = self._request(
             {
                 "op": "prepare_start",
@@ -456,22 +585,11 @@ class RealMirrorSink:
         summary = arm_error_summary(target, self._latest_state_deg, include_gripper=include_gripper)
         if float(summary["max_error_deg"]) > self.config.start_pose_tolerance_deg:
             raise MirrorSafetyError(
-                "Real start pose not reached after normal preparation: "
+                f"Real start pose sample {sample_index}/{sample_count} not reached: "
                 f"max_error={summary['max_error_deg']:.3f} deg, "
                 f"tolerance={self.config.start_pose_tolerance_deg:.3f} deg."
             )
-        self._last_target_deg = target
-        self._first_target_checked = False
-        self._prepared = True
-        self.start_keepalive()
-        return {
-            "ok": True,
-            "event": response.get("event", "prepared_start"),
-            "state_deg": self._latest_state_deg,
-            "max_error_deg": summary["max_error_deg"],
-            "gripper_sent_to_real": include_gripper,
-            "start_pose_method": "helper_prepare_start",
-        }
+        return response, summary
 
     def stage_pose_without_audit(
         self,
@@ -606,11 +724,28 @@ class RealMirrorSink:
     def _start_pose_rate_hz(self) -> float:
         return float(self.config.start_pose_rate_hz or self.config.rate_hz)
 
+    def _helper_max_relative_target_deg(self) -> float:
+        return float(self.config.helper_max_relative_target_deg or self.config.max_joint_delta_deg)
+
     def _start_pose_request_timeout_sec(self) -> float:
         return max(
             float(self.config.request_timeout_sec),
             float(self.config.start_pose_timeout_sec) + 10.0,
         )
+
+    def _fixed_start_pose_samples(
+        self,
+        start: list[float],
+        target: list[float],
+        *,
+        samples: int,
+    ) -> list[list[float]]:
+        if samples < 1:
+            raise MirrorSafetyError("--real-start-pose-samples must be at least 1.")
+        return [
+            [float(start[index] + (target[index] - start[index]) * (step / samples)) for index in range(8)]
+            for step in range(1, samples + 1)
+        ]
 
     def _interpolated_start_pose_targets(self, start: list[float], target: list[float]) -> list[list[float]]:
         include_gripper = not self.config.disable_gripper_real

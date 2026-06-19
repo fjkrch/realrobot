@@ -1,0 +1,108 @@
+[3gH    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H   [INFO] Using python from: /home/chyanin/miniconda3/envs/env_isaaclab/bin/python
+[dense] episode_len=100 control steps, image=256px, keep-success-only, drop_limit=False, gripper_close=-3.000 deg
+[dense] launching Isaac (num_envs=8, cameras=on)
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /home/chyanin/IsaacLab/apps/isaaclab.python.headless.rendering.kit
+Loading user config located at: '/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260619_130618.log
+2026-06-19T06:06:18Z [3ms] [Warning] [omni.ext.plugin] [ext: hsi_pregrasp_refusal] Extensions config 'extension.toml' doesn't exist '/home/chyanin/IsaacLab/source/hsi_pregrasp_refusal' or '/home/chyanin/IsaacLab/source/hsi_pregrasp_refusal/config'
+2026-06-19T06:06:18Z [487ms] [Warning] [gpu.foundation.plugin] Skipping unsupported non-NVIDIA GPU: AMD Radeon 780M Graphics (RADV PHOENIX)
+2026-06-19T06:06:18Z [487ms] [Warning] [gpu.foundation.plugin] Skipping unsupported non-NVIDIA GPU: AMD Radeon 780M Graphics (RADV PHOENIX)
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.159.03    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 4060 Laptop.. | Yes: 0 |     | 8188    MB | 10de      | 0          |
+|     |                                  |        |     |            | 28e0      | 78564eae.. |
+|     |                                  |        |     |            | 1         |            |
+|---------------------------------------------------------------------------------------------|
+| 1   | AMD Radeon 780M Graphics (RADV.. |        |     | 5396    MB | 1002      | 0          |
+|     |                                  |        |     |            | 15bf      | 00000000.. |
+|     |                                  |        |     |            | 6         |            |
+|=============================================================================================|
+| OS: 24.04.3 LTS (Noble Numbat) ubuntu, Version: 24.04.3, Kernel: 6.17.0-35-generic
+| XServer Vendor: The X.Org Foundation, XServer Version: 12101011 (1.21.1.11)
+| Processor: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+| Cores: 8 | Logical Cores: 16
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 15165 | Free Memory: 9367
+| Total Page/Swap (MB): 4095 | Free Page/Swap: 2786
+|---------------------------------------------------------------------------------------------|
+2026-06-19T06:06:19Z [799ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2026-06-19T06:06:19Z [799ms] [Warning] [gpu.foundation.plugin] Detected IOMMU is enabled. Running CUDA peer-to-peer bandwidth and latency validation.
+Unidirectional P2P=Enabled Bandwidth (P2P Writes) Matrix (GB/s)
+   D\D     0 
+     0 198.04 
+P2P=Enabled Latency (P2P Writes) Matrix (us)
+   GPU     0 
+     0   1.60 
+
+   CPU     0 
+     0   2.15 
+2026-06-19T06:06:19Z [1,538ms] [Warning] [omni.log] Source: omni.hydra was already registered.
+2026-06-19T06:06:20Z [1,775ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-06-19T06:06:20Z [1,790ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+2026-06-19T06:06:21Z [3,205ms] [Warning] [pxr.Semantics] pxr.Semantics is deprecated - please use Semantics instead
+2026-06-19T06:06:21Z [3,304ms] [Warning] [omni.graph.core.plugin] Found duplicate of category 'Replicator' - was 'Annotators', adding 'Fabric Reader'
+2026-06-19T06:06:21Z [3,304ms] [Warning] [omni.graph.core.plugin] Category 'Replicator' not accepted on node type 'omni.replicator.core.FabricReader' in extension 'omni.replicator.core'
+2026-06-19T06:06:21Z [3,305ms] [Warning] [omni.replicator.core.scripts.extension] No material configuration file, adding configuration to material settings directly.
+2026-06-19T06:06:24Z [6,186ms] [Warning] [omni.fabric.plugin] Warning: attribute viewportHandle not found for bucket id 7
+
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-06-19_13-06-25.log[0m
+[36m======================================================================================[0m
+
+[33m13:06:25 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[33m13:06:28 [articulation.py] WARNING: Not all actuators are configured! Total number of actuated joints not equal to number of joints available: 18 != 22.[0m
+2026-06-19T06:06:28Z [10,414ms] [Warning] [carb] Client omni.hydratexture.plugin has acquired [carb::settings::ISettings v1.0] 100 times. Consider accessing this interface with carb::getCachedInterface() (Performance warning)
+2026-06-19T06:06:28Z [10,424ms] [Warning] [carb] Client omni.hydratexture.plugin has acquired [carb::dictionary::IDictionary v1.1] 100 times. Consider accessing this interface with carb::getCachedInterface() (Performance warning)
+2026-06-19T06:06:28Z [10,539ms] [Warning] [omni.fabric.plugin] getAttributeCount called on non-existent path /World/envs/env_7/Robot/openarm_right_right_finger/collisions/openarm_right_right_finger_collision
+2026-06-19T06:06:28Z [10,539ms] [Warning] [omni.fabric.plugin] getTypes called on non-existent path /World/envs/env_7/Robot/openarm_right_right_finger/collisions/openarm_right_right_finger_collision
+2026-06-19T06:06:29Z [11,417ms] [Warning] [rtx.postprocessing.plugin] DLSS increasing input dimensions: Render resolution of (148, 148) is below minimal input resolution of 300.
+[dense] finger bodies for penetration check: ['openarm_left_right_finger', 'openarm_left_left_finger']
+[33m13:06:34 [video_utils.py] WARNING: 'torchcodec' is not available in your platform, falling back to 'pyav' as a default decoder[0m
+2026-06-19T06:06:35Z [17,574ms] [Warning] [carb] Client gpu.foundation.plugin has acquired [gpu::unstable::IMemoryBudgetManagerFactory v0.1] 100 times. Consider accessing this interface with carb::getCachedInterface() (Performance warning)
+[dense] round 1/6: source=8 kept=0 (round success=0.875)
+[dense] round 2/6: source=16 kept=0 (round success=0.750)
+[dense] round 3/6: source=24 kept=0 (round success=0.625)
+[dense] round 4/6: source=32 kept=0 (round success=0.375)
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1303.50 examples/s]
+[dense] round 5/6: source=40 kept=1 (round success=0.625)
+[dense] round 6/6: source=48 kept=1 (round success=0.375)
+{
+  "ok": true,
+  "source_episodes": 48,
+  "kept": 1,
+  "kept_rate": 0.020833333333333332,
+  "wrong_object": 1,
+  "limit_clamp": 48,
+  "object_collision": 0,
+  "gripper_table_collision": 0,
+  "object_sweep": 1,
+  "tabletop_penetration": 0,
+  "object_pushed_down": 0,
+  "refined_action_clip": 47,
+  "grasp_close_deg": -3.0,
+  "grasp_z_offset_m": 0.0,
+  "lift_offset_m": 0.05,
+  "image_size": 256,
+  "episode_len": 100,
+  "dataset_root": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/clean1000_smoke_balanced_left",
+  "repo_id": "local/clean1000_smoke_balanced_left",
+  "manifest": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/clean1000_smoke_balanced_left_manifest.jsonl",
+  "report": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/clean1000_smoke_balanced_left_collect.md",
+  "kept_by_target": {
+    "green_cube": 1
+  },
+  "source_by_target": {
+    "green_cube": 18,
+    "blue_cube": 12,
+    "red_cube": 11,
+    "orange_ball": 7
+  }
+}

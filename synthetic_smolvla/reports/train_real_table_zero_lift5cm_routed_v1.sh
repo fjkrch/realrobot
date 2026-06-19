@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+set -euo pipefail
+/home/chyanin/miniconda3/envs/env_isaaclab/bin/python -m lerobot.scripts.lerobot_train --dataset.repo_id local/openarm_real_table_zero_v1_lift5cm_routed_v1 --dataset.root /home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_routed_v1 --policy.path=lerobot/smolvla_base --policy.device=cuda --policy.push_to_hub=false --policy.repo_id=local/smolvla_openarm_real_table_zero_lift5cm_routed_v1 --output_dir /home/chyanin/Desktop/realrobot/synthetic_smolvla/checkpoints/smolvla_openarm_real_table_zero_lift5cm_routed_v1 --batch_size 1 --steps 20000 --save_freq 5000 --log_freq 10 --num_workers 0 --wandb.enable false --policy.n_action_steps=10

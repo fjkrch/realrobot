@@ -1,0 +1,110 @@
+# OpenArm Real-Table Zero Cleanup Plan
+
+Date: 2026-06-19
+
+Simulation only. This cleanup plan does not touch real robot files or hardware.
+
+## Keep
+
+Current useful real-table zero artifacts:
+
+```text
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_routed_v1
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_routed_v2_extra_right
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_right_start20_v1
+synthetic_smolvla/checkpoints/smolvla_openarm_real_table_zero_lift5cm_routed_v2_from020_lr3e5
+```
+
+Rationale:
+
+- `routed_v1` is the dataset embedded in the current preferred checkpoint's
+  `train_config.json`.
+- `routed_v2_extra_right` is the complete larger clean merged dataset.
+- `right_start20_v1` is the new start-focused dataset for the next fix.
+- `routed_v2_from020_lr3e5` is the current preferred checkpoint family.
+
+## Delete Batch
+
+Delete these stale/different-scene/duplicated/fallback artifacts:
+
+```text
+synthetic_smolvla/datasets/openarm_dense_isaac_camera_smoke
+synthetic_smolvla/datasets/openarm_dense_isaac_camera_v1
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_blue_left_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_green_left_zp01_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_orange_right_extra_m3_256
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_orange_right_fallback_m2_128
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_orange_right_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_red_right_extra_m3_256
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_red_right_fallback_m2_128
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_red_right_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_right_fallback_m2_150step_v1
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_right_fallback_m2_v1
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_smoke_green_left_zp01_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_routed_blue_left_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_routed_green_left_center_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_routed_green_left_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_routed_green_left_zp01_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_routed_orange_right_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_routed_red_right_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_smoke
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_smoke_blue_left_m2
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_smoke_reachable_left_green_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_smoke_reachable_left_green_zp01_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_smoke_reachable_left_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_smoke_reachable_left_orange_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_smoke_reachable_left_red_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_smoke_reachable_right_green_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_smoke_reachable_right_orange_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_smoke_reachable_right_red_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_smoke_right_m3
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_smoke_routed_merge
+synthetic_smolvla/datasets/openarm_success_filtered_14000
+synthetic_smolvla/checkpoints/smolvla_openarm_dense_isaac_camera_v1
+synthetic_smolvla/checkpoints/smolvla_openarm_real_table_zero_lift5cm_right_fallback_m2_v1_from_v2_010_lr1e5
+synthetic_smolvla/checkpoints/smolvla_openarm_real_table_zero_lift5cm_routed_v1
+synthetic_smolvla/checkpoints/smolvla_openarm_success_filtered_14000
+synthetic_smolvla/checkpoints/smolvla_openarm_success_filtered_extra10000
+synthetic_smolvla/checkpoints/smolvla_openarm_synth_v1
+synthetic_smolvla/checkpoints/smolvla_openarm_synth_v1_smoke
+synthetic_smolvla/checkpoints/smolvla_openarm_synth_v2_smoke
+```
+
+Notes:
+
+- The old `smolvla_openarm_real_table_zero_lift5cm_routed_v1` checkpoint family
+  is a source lineage checkpoint, but the current preferred checkpoint remains
+  loadable without it.
+- Reports/manifests are intentionally kept so the audit trail remains available.
+
+## Cleanup Result
+
+The delete batch was executed and verified.
+
+Remaining dataset roots:
+
+```text
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_routed_v1
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_routed_v2_extra_right
+synthetic_smolvla/datasets/openarm_real_table_zero_v1_lift5cm_right_start20_v1
+```
+
+Remaining checkpoint roots:
+
+```text
+synthetic_smolvla/checkpoints/smolvla_openarm_real_table_zero_lift5cm_routed_v2_from020_lr3e5
+```
+
+Verified remaining dataset sizes:
+
+| Dataset | Episodes | Frames |
+|---|---:|---:|
+| `openarm_real_table_zero_v1_lift5cm_routed_v1` | 469 | 46,900 |
+| `openarm_real_table_zero_v1_lift5cm_routed_v2_extra_right` | 974 | 97,400 |
+| `openarm_real_table_zero_v1_lift5cm_right_start20_v1` | 760 | 15,200 |
+
+Free space after cleanup:
+
+```text
+31G free on /home/chyanin/Desktop/realrobot
+```

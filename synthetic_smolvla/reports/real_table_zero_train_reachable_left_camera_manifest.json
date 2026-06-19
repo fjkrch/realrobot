@@ -1,0 +1,348 @@
+{
+  "objects": [
+    {
+      "color_rgb": [
+        1.0,
+        0.45,
+        0.02
+      ],
+      "instruction": "pick up the orange ball",
+      "name": "orange_ball",
+      "radius_m": 0.02,
+      "shape": "sphere",
+      "spawn_pose_m": [
+        0.68,
+        -0.24,
+        0.77
+      ]
+    },
+    {
+      "color_rgb": [
+        0.9,
+        0.03,
+        0.03
+      ],
+      "instruction": "pick up the red cube",
+      "name": "red_cube",
+      "shape": "cube",
+      "size_m": [
+        0.0254,
+        0.0254,
+        0.0254
+      ],
+      "spawn_pose_m": [
+        0.68,
+        -0.08,
+        0.765
+      ]
+    },
+    {
+      "color_rgb": [
+        0.05,
+        0.7,
+        0.12
+      ],
+      "instruction": "pick up the green cube",
+      "name": "green_cube",
+      "shape": "cube",
+      "size_m": [
+        0.0254,
+        0.0254,
+        0.0254
+      ],
+      "spawn_pose_m": [
+        0.68,
+        0.08,
+        0.765
+      ]
+    },
+    {
+      "color_rgb": [
+        0.04,
+        0.2,
+        0.95
+      ],
+      "instruction": "pick up the blue cube",
+      "name": "blue_cube",
+      "shape": "cube",
+      "size_m": [
+        0.0254,
+        0.0254,
+        0.0254
+      ],
+      "spawn_pose_m": [
+        0.68,
+        0.24,
+        0.765
+      ]
+    }
+  ],
+  "robot": {
+    "base_pose_m": [
+      0.38,
+      0.0,
+      0.6
+    ],
+    "reset_pose_deg": {
+      "left": {
+        "gripper": 0.0,
+        "joint_1": 0.0,
+        "joint_2": 0.0,
+        "joint_3": 0.0,
+        "joint_4": 0.0,
+        "joint_5": 0.0,
+        "joint_6": 0.0,
+        "joint_7": 0.0
+      },
+      "right": {
+        "gripper": 0.0,
+        "joint_1": 0.0,
+        "joint_2": 0.0,
+        "joint_3": 0.0,
+        "joint_4": 0.0,
+        "joint_5": 0.0,
+        "joint_6": 0.0,
+        "joint_7": 0.0
+      }
+    }
+  },
+  "scene": {
+    "active_arm": "left",
+    "allow_out_of_contract_reset_pose": true,
+    "appearance": {
+      "baseboard": {
+        "color_rgb": [
+          0.055,
+          0.052,
+          0.05
+        ],
+        "enabled": true,
+        "pose_m": [
+          2.385,
+          0.0,
+          0.055
+        ],
+        "roughness": 0.82,
+        "size_m": [
+          0.055,
+          4.0,
+          0.1
+        ]
+      },
+      "floor": {
+        "color_rgb": [
+          0.5,
+          0.5,
+          0.49
+        ],
+        "enabled": true,
+        "pose_m": [
+          1.35,
+          0.0,
+          -0.008
+        ],
+        "roughness": 0.98,
+        "size_m": [
+          5.0,
+          4.0,
+          0.02
+        ],
+        "speckles": {
+          "color_rgb_max": [
+            0.7,
+            0.7,
+            0.68
+          ],
+          "color_rgb_min": [
+            0.34,
+            0.34,
+            0.33
+          ],
+          "count": 88,
+          "margin_m": 0.18,
+          "max_size_m": 0.1,
+          "min_size_m": 0.03,
+          "region_m": {
+            "x": [
+              -0.3,
+              0.56
+            ],
+            "y": [
+              -1.1,
+              1.1
+            ]
+          },
+          "thickness_m": 0.004,
+          "z_offset_m": 0.008
+        }
+      },
+      "table_rim": {
+        "color_rgb": [
+          0.015,
+          0.015,
+          0.018
+        ],
+        "enabled": true,
+        "height_m": 0.04,
+        "roughness": 0.8,
+        "sides": [
+          "front",
+          "left",
+          "right"
+        ],
+        "thickness_m": 0.035
+      },
+      "wall": {
+        "color_rgb": [
+          0.82,
+          0.82,
+          0.78
+        ],
+        "enabled": true,
+        "pose_m": [
+          2.42,
+          0.0,
+          0.875
+        ],
+        "roughness": 0.9,
+        "size_m": [
+          0.04,
+          4.0,
+          1.75
+        ]
+      }
+    },
+    "camera": {
+      "eye_m": [
+        0.56,
+        0.0,
+        1.08
+      ],
+      "focal_length_mm": 12.0,
+      "prim_path": "/World/RobotViewCamera",
+      "resolution": [
+        256,
+        256
+      ],
+      "target_m": [
+        0.76,
+        0.0,
+        0.745
+      ]
+    },
+    "layout_info_cm": {
+      "fallback_root_offset_reason": "USD root calibrated for reachable sim-only tabletop training",
+      "robot_base_width": 43.0,
+      "robot_plus_table_height": 125.0,
+      "table_edge_width": 150.0,
+      "table_height": 75.0,
+      "table_to_robot_gap": 30.0,
+      "total_horizontal_space": 223.0
+    },
+    "name": "openarm_real_table_zero_train_reachable_left_v1",
+    "openarm_setup": "bimanual",
+    "sim_only": true,
+    "table": {
+      "color_rgb": [
+        0.93,
+        0.91,
+        0.84
+      ],
+      "pose_m": [
+        1.265,
+        0.0,
+        0.73
+      ],
+      "prim_path": "/World/Table",
+      "size_m": [
+        1.5,
+        1.5,
+        0.04
+      ]
+    },
+    "workspace_bounds_m": {
+      "x": [
+        0.52,
+        2.02
+      ],
+      "y": [
+        -0.75,
+        0.75
+      ],
+      "z": [
+        0.74,
+        0.79
+      ]
+    }
+  },
+  "simulation_limit_contract": {
+    "max_finger_open_m": 0.044,
+    "safe_arm_limits_deg": {
+      "left": {
+        "joint_1": [
+          -73.0,
+          73.0
+        ],
+        "joint_2": [
+          -88.0,
+          7.0
+        ],
+        "joint_3": [
+          -83.0,
+          83.0
+        ],
+        "joint_4": [
+          2.0,
+          133.0
+        ],
+        "joint_5": [
+          -83.0,
+          83.0
+        ],
+        "joint_6": [
+          -38.0,
+          38.0
+        ],
+        "joint_7": [
+          -78.0,
+          78.0
+        ]
+      },
+      "right": {
+        "joint_1": [
+          -73.0,
+          73.0
+        ],
+        "joint_2": [
+          -7.0,
+          88.0
+        ],
+        "joint_3": [
+          -83.0,
+          83.0
+        ],
+        "joint_4": [
+          2.0,
+          133.0
+        ],
+        "joint_5": [
+          -83.0,
+          83.0
+        ],
+        "joint_6": [
+          -38.0,
+          38.0
+        ],
+        "joint_7": [
+          -78.0,
+          78.0
+        ]
+      }
+    },
+    "safe_gripper_limit_deg": [
+      -65.0,
+      0.0
+    ]
+  },
+  "status": "isaac_scene_launched"
+}

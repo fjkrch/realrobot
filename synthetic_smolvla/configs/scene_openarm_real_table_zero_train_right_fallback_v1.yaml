@@ -1,0 +1,119 @@
+scene:
+  name: openarm_real_table_zero_train_right_fallback_v1
+  sim_only: true
+  openarm_setup: bimanual
+  active_arm: right
+  # Square robot-view training scene for the approved real-table appearance.
+  # Right-arm fallback after audited left-arm no-lift; the left arm stays
+  # passive/locked by the collection and eval scripts.
+  # Reset pose is intentionally all zeros; command/action clamps still come from
+  # sim_contract.py.
+  allow_out_of_contract_reset_pose: true
+  layout_info_cm:
+    table_height: 75.0
+    table_edge_width: 150.0
+    robot_plus_table_height: 125.0
+    robot_base_width: 43.0
+    table_to_robot_gap: 30.0
+    total_horizontal_space: 223.0
+  table:
+    prim_path: /World/Table
+    size_m: [1.50, 1.50, 0.04]
+    pose_m: [1.265, 0.0, 0.73]
+    color_rgb: [0.93, 0.91, 0.84]
+  appearance:
+    floor:
+      enabled: true
+      size_m: [5.0, 4.0, 0.02]
+      pose_m: [1.35, 0.0, -0.008]
+      color_rgb: [0.50, 0.50, 0.49]
+      roughness: 0.98
+      speckles:
+        count: 88
+        margin_m: 0.18
+        min_size_m: 0.030
+        max_size_m: 0.100
+        thickness_m: 0.004
+        z_offset_m: 0.008
+        region_m:
+          x: [-0.30, 0.56]
+          y: [-1.10, 1.10]
+        color_rgb_min: [0.34, 0.34, 0.33]
+        color_rgb_max: [0.70, 0.70, 0.68]
+    table_rim:
+      enabled: true
+      sides: [front, left, right]
+      thickness_m: 0.035
+      height_m: 0.04
+      color_rgb: [0.015, 0.015, 0.018]
+      roughness: 0.80
+    wall:
+      enabled: true
+      size_m: [0.04, 4.0, 1.75]
+      pose_m: [2.42, 0.0, 0.875]
+      color_rgb: [0.82, 0.82, 0.78]
+      roughness: 0.90
+    baseboard:
+      enabled: true
+      size_m: [0.055, 4.0, 0.10]
+      pose_m: [2.385, 0.0, 0.055]
+      color_rgb: [0.055, 0.052, 0.050]
+      roughness: 0.82
+  camera:
+    prim_path: /World/RobotViewCamera
+    resolution: [256, 256]
+    eye_m: [0.18, 0.0, 0.96]
+    target_m: [0.70, 0.0, 0.735]
+    focal_length_mm: 16.0
+  workspace_bounds_m:
+    x: [0.52, 2.02]
+    y: [-0.75, 0.75]
+    z: [0.74, 0.79]
+
+robot:
+  base_pose_m: [0.0, 0.0, 0.0]
+  reset_pose_deg:
+    right:
+      joint_1: 0.0
+      joint_2: 0.0
+      joint_3: 0.0
+      joint_4: 0.0
+      joint_5: 0.0
+      joint_6: 0.0
+      joint_7: 0.0
+      gripper: 0.0
+    left:
+      joint_1: 0.0
+      joint_2: 0.0
+      joint_3: 0.0
+      joint_4: 0.0
+      joint_5: 0.0
+      joint_6: 0.0
+      joint_7: 0.0
+      gripper: 0.0
+
+objects:
+  - name: orange_ball
+    instruction: pick up the orange ball
+    shape: sphere
+    color_rgb: [1.0, 0.45, 0.02]
+    radius_m: 0.020
+    spawn_pose_m: [0.68, -0.24, 0.77]
+  - name: red_cube
+    instruction: pick up the red cube
+    shape: cube
+    color_rgb: [0.9, 0.03, 0.03]
+    size_m: [0.0254, 0.0254, 0.0254]
+    spawn_pose_m: [0.68, -0.08, 0.765]
+  - name: green_cube
+    instruction: pick up the green cube
+    shape: cube
+    color_rgb: [0.05, 0.70, 0.12]
+    size_m: [0.0254, 0.0254, 0.0254]
+    spawn_pose_m: [0.68, 0.08, 0.765]
+  - name: blue_cube
+    instruction: pick up the blue cube
+    shape: cube
+    color_rgb: [0.04, 0.20, 0.95]
+    size_m: [0.0254, 0.0254, 0.0254]
+    spawn_pose_m: [0.68, 0.24, 0.765]

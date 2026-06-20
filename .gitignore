@@ -2,3 +2,14 @@
 *.private.md
 logs/
 __pycache__/
+
+# Generated simulation/report picture artifacts.
+synthetic_smolvla/reports/**/*.png
+synthetic_smolvla/reports/**/*.ppm
+synthetic_smolvla/reports/**/*.jpg
+synthetic_smolvla/reports/**/*.jpeg
+synthetic_smolvla/reports/**/*.webp
+synthetic_smolvla/datasets/**/images/**/*.png
+synthetic_smolvla/datasets/**/images/**/*.jpg
+synthetic_smolvla/datasets/**/images/**/*.jpeg
+synthetic_smolvla/datasets/**/images/**/*.webp

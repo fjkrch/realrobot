@@ -73,6 +73,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--lift-threshold-m", type=float, default=0.04)
     p.add_argument("--max-gripper-close-deg", type=float, default=-3.0,
                    help="gripper command must never exceed this (close past it)")
+    p.add_argument("--max-arm-action-delta-deg", type=float, default=0.0,
+                   help="optional gate: max recorded arm command delta per control step (0 disables)")
     p.add_argument("--out-md", default="synthetic_smolvla/reports/openarm_real_table_zero_v2_clean1000_audit.md")
     p.add_argument("--out-json", default="synthetic_smolvla/reports/openarm_real_table_zero_v2_clean1000_audit.json")
     return p
@@ -171,6 +173,16 @@ def audit_manifests(manifests: list[Path], args) -> dict:
          f"max_refined_action_clip_deg={max(refined_max) if refined_max else float('nan'):.4f} "
          f"(legacy limit_exceeded rate over kept={sum(old_limit)}/{retained} — known misleading proxy)")
 
+    # --- recorded arm command slew limit ---
+    arm_delta = fcol("max_arm_action_delta_deg")
+    has_arm_delta_field = all("max_arm_action_delta_deg" in r for r in kept_rows)
+    worst_arm_delta = max(arm_delta) if arm_delta else float("nan")
+    if args.max_arm_action_delta_deg > 0.0:
+        arm_delta_ok = has_arm_delta_field and bool(arm_delta) and worst_arm_delta <= args.max_arm_action_delta_deg + 1e-3
+        gate("arm_action_delta_within_limit", arm_delta_ok,
+             f"max_arm_action_delta_deg={worst_arm_delta:.4f} "
+             f"limit={args.max_arm_action_delta_deg:.4f} has_field={has_arm_delta_field}")
+
     # --- 100-step proof ---
     ep_lens = [int(r.get("episode_len", -1)) for r in kept_rows]
     gate("episode_len_100", bool(ep_lens) and all(n == args.expected_episode_len for n in ep_lens),
@@ -201,6 +213,7 @@ def audit_manifests(manifests: list[Path], args) -> dict:
         "gripper_cmd_worst_close_deg": worst_close,
         "gripper_cmd_most_open_deg": min(gmin) if gmin else None,
         "legacy_limit_exceeded_kept": sum(old_limit),
+        "max_arm_action_delta_deg": worst_arm_delta if arm_delta else None,
         "sample_frames": sample_frames[:16],
         "gates": gates,
     }
@@ -319,6 +332,7 @@ def write_report(manifest_audit: dict, dataset_audit: dict, args, out_md: Path) 
         f"- Min finger/table clearance over footprint m: `{manifest_audit['min_finger_table_clearance_over_footprint_m']}`",
         f"- Gripper cmd worst close deg (<= {args.max_gripper_close_deg}): `{manifest_audit['gripper_cmd_worst_close_deg']}`",
         f"- Gripper cmd most open deg: `{manifest_audit['gripper_cmd_most_open_deg']}`",
+        f"- Max arm action delta deg: `{manifest_audit['max_arm_action_delta_deg']}`",
         f"- Legacy `limit_exceeded` over retained (known misleading proxy): `{manifest_audit['legacy_limit_exceeded_kept']}`",
         "",
         "## LeRobot dataset gates",

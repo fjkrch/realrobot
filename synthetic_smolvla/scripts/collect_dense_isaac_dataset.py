@@ -125,6 +125,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--hold-steps", type=int, default=4)
     p.add_argument("--substeps", type=int, default=12, help="physics steps per control step (match eval)")
     p.add_argument("--settle-steps", type=int, default=40)
+    p.add_argument(
+        "--prepose-to-ready",
+        action="store_true",
+        help="run a non-recorded IK warmup to an above-object ready pose, then record approach as zero->ready joint interpolation",
+    )
+    p.add_argument(
+        "--prepose-warmup-steps",
+        type=int,
+        default=120,
+        help="non-recorded IK iterations used by --prepose-to-ready before resetting and recording",
+    )
     p.add_argument("--above-offset-m", type=float, default=0.12)
     p.add_argument(
         "--grasp-z-offset-m",
@@ -164,6 +175,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    help="genuine action-clip threshold (deg) for the refined unsafe-clip reject flag")
     p.add_argument("--joint4-startup-tol-deg", type=float, default=3.0,
                    help="ignore joint_4 lower-bound clamps up to this magnitude (the unavoidable zero-start correction)")
+    p.add_argument(
+        "--max-arm-action-step-deg",
+        type=float,
+        default=0.0,
+        help="optional slew limit for recorded arm commands; 0 disables, 1 limits each arm joint to <=1 deg/control step",
+    )
     # Target sampling weights, aligned to config object order [orange,red,green,blue].
     p.add_argument("--target-weights", default="2.5,1,1,1", help="comma weights for object sampling")
     p.add_argument("--drop-limit-exceeded", action="store_true", help="reject episodes that hit the limit clamp")
@@ -185,6 +202,10 @@ def _resolve(path: str) -> Path:
 
 def main() -> int:
     args = build_arg_parser().parse_args()
+    if args.prepose_warmup_steps < 0:
+        raise SystemExit("--prepose-warmup-steps must be >= 0.")
+    if args.max_arm_action_step_deg < 0:
+        raise SystemExit("--max-arm-action-step-deg must be >= 0.")
     config = load_yaml_config(args.config)
     validate_scene_config(config)
 
@@ -241,7 +262,11 @@ def main() -> int:
         )
     print(f"[dense] episode_len={episode_len} control steps, image={image_size}px, "
           f"keep-success-only, drop_limit={args.drop_limit_exceeded}, "
-          f"gripper_close={effective_close_deg:.3f} deg", file=sys.stderr, flush=True)
+          f"gripper_close={effective_close_deg:.3f} deg, "
+          f"prepose_to_ready={args.prepose_to_ready}, "
+          f"prepose_warmup_steps={args.prepose_warmup_steps}, "
+          f"max_arm_action_step_deg={float(args.max_arm_action_step_deg):.3f}",
+          file=sys.stderr, flush=True)
 
     _isaac_paths()
     from isaaclab.app import AppLauncher
@@ -473,13 +498,18 @@ def main() -> int:
         return closed_m  # lift, hold
 
     for rnd in range(args.rounds):
+        if args.max_keep and kept >= args.max_keep:
+            print(
+                f"[dense] reached --max-keep={args.max_keep}; stopping before round {rnd+1}/{args.rounds}.",
+                file=sys.stderr,
+                flush=True,
+            )
+            break
         robot.write_joint_state_to_sim(robot.data.default_joint_pos, robot.data.default_joint_vel)
         robot.reset()
         origins = scene.env_origins
         ep_obj_local: dict[str, torch.Tensor] = {}
         for name in obj_names:
-            asset = scene[name]
-            root = asset.data.default_root_state.clone()
             base = torch.tensor(spawn_for[name], device=device)
             jit = torch.zeros((N, 3), device=device)
             if args.randomize:
@@ -491,27 +521,57 @@ def main() -> int:
             local[:, 0] = torch.clamp(local[:, 0], bounds["x"][0], bounds["x"][1])
             local[:, 1] = torch.clamp(local[:, 1], bounds["y"][0], bounds["y"][1])
             ep_obj_local[name] = local
-            root[:, 0:3] = local + origins
-            root[:, 3:7] = ident
-            root[:, 7:] = 0.0
-            asset.write_root_pose_to_sim(root[:, :7])
-            asset.write_root_velocity_to_sim(root[:, 7:])
+
+        def write_episode_objects_to_sim() -> None:
+            for obj_name in obj_names:
+                asset = scene[obj_name]
+                root = asset.data.default_root_state.clone()
+                root[:, 0:3] = ep_obj_local[obj_name] + origins
+                root[:, 3:7] = ident
+                root[:, 7:] = 0.0
+                asset.write_root_pose_to_sim(root[:, :7])
+                asset.write_root_velocity_to_sim(root[:, 7:])
+
+        write_episode_objects_to_sim()
         set_gripper(open_m)
         step_phys(args.settle_steps, render_last=True)  # also primes the camera render
 
         # Weighted target per env.
         target_idx = torch.multinomial(wtensor, N, replacement=True, generator=rng).to(device)
 
-        ow = obj_pos_w()
-        baseline_pos = ow.clone()
-        baseline = baseline_pos[:, :, 2].clone()
-        baseline_xy = baseline_pos[:, :, 0:2].clone()
-        tw = ow.gather(1, target_idx.view(-1, 1, 1).expand(-1, 1, 3)).squeeze(1)  # [N,3]
-        ox, oy = tw[:, 0], tw[:, 1]
-        grasp_z = tw[:, 2] + float(args.grasp_z_offset_m)
-        above = torch.stack([ox, oy, grasp_z + args.above_offset_m], dim=-1)
-        descend = torch.stack([ox, oy, grasp_z], dim=-1)
-        lift = torch.stack([ox, oy, grasp_z + args.lift_offset_m], dim=-1)
+        def episode_geometry() -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+            ow_now = obj_pos_w()
+            baseline_pos_now = ow_now.clone()
+            baseline_now = baseline_pos_now[:, :, 2].clone()
+            baseline_xy_now = baseline_pos_now[:, :, 0:2].clone()
+            tw_now = ow_now.gather(1, target_idx.view(-1, 1, 1).expand(-1, 1, 3)).squeeze(1)
+            ox_now, oy_now = tw_now[:, 0], tw_now[:, 1]
+            grasp_z_now = tw_now[:, 2] + float(args.grasp_z_offset_m)
+            above_now = torch.stack([ox_now, oy_now, grasp_z_now + args.above_offset_m], dim=-1)
+            descend_now = torch.stack([ox_now, oy_now, grasp_z_now], dim=-1)
+            lift_now = torch.stack([ox_now, oy_now, grasp_z_now + args.lift_offset_m], dim=-1)
+            return baseline_pos_now, baseline_now, baseline_xy_now, tw_now, above_now, descend_now, lift_now
+
+        baseline_pos, baseline, baseline_xy, tw, above, descend, lift = episode_geometry()
+
+        reset_arm = robot.data.joint_pos[:, ent.joint_ids].clone()
+        ready_arm = reset_arm
+        if args.prepose_to_ready:
+            set_ik_command(above)
+            for _ in range(args.prepose_warmup_steps):
+                jclamped, _, _ = ik_solve_clamped()
+                robot.set_joint_position_target(jclamped, joint_ids=arm_ids)
+                set_gripper(open_m)
+                step_phys(1, render_last=False)
+            ready_arm = robot.data.joint_pos[:, ent.joint_ids].clone()
+
+            robot.write_joint_state_to_sim(robot.data.default_joint_pos, robot.data.default_joint_vel)
+            robot.reset()
+            write_episode_objects_to_sim()
+            set_gripper(open_m)
+            step_phys(args.settle_steps, render_last=True)
+            baseline_pos, baseline, baseline_xy, tw, above, descend, lift = episode_geometry()
+            reset_arm = robot.data.joint_pos[:, ent.joint_ids].clone()
 
         # Per-env dense buffers.
         rgb_buf = [[] for _ in range(N)]
@@ -531,7 +591,27 @@ def main() -> int:
         object_pushed_down_hit = torch.zeros(N, dtype=torch.bool, device=device)
         refined_clip_hit = torch.zeros(N, dtype=torch.bool, device=device)
         max_refined_clip_deg = torch.zeros(N, device=device)
+        arm_slew_limited_hit = torch.zeros(N, dtype=torch.bool, device=device)
+        max_arm_action_delta_deg = torch.zeros(N, device=device)
+        max_arm_raw_delta_deg = torch.zeros(N, device=device)
         last_arm = robot.data.joint_pos[:, ent.joint_ids].clone()
+        max_arm_step_rad = math.radians(float(args.max_arm_action_step_deg))
+
+        def apply_arm_slew_limit(jraw: torch.Tensor) -> torch.Tensor:
+            nonlocal last_arm, arm_slew_limited_hit, max_arm_action_delta_deg, max_arm_raw_delta_deg
+            delta_raw = jraw - last_arm
+            raw_delta_deg = torch.abs(delta_raw).max(dim=-1).values * 180.0 / math.pi
+            max_arm_raw_delta_deg = torch.maximum(max_arm_raw_delta_deg, raw_delta_deg)
+            if max_arm_step_rad > 0.0:
+                limited_delta = torch.clamp(delta_raw, min=-max_arm_step_rad, max=max_arm_step_rad)
+                arm_slew_limited_hit |= raw_delta_deg > (float(args.max_arm_action_step_deg) + 1.0e-6)
+                jcmd = last_arm + limited_delta
+            else:
+                jcmd = jraw
+            actual_delta_deg = torch.abs(jcmd - last_arm).max(dim=-1).values * 180.0 / math.pi
+            max_arm_action_delta_deg = torch.maximum(max_arm_action_delta_deg, actual_delta_deg)
+            last_arm = jcmd
+            return jcmd
 
         def object_sweep_state() -> tuple[torch.Tensor, torch.Tensor]:
             pos = obj_pos_w()
@@ -560,17 +640,20 @@ def main() -> int:
 
         phase_target = {"approach": above, "descend": descend, "close": descend, "lift": lift, "hold": lift}
         for phase, n_steps in phase_plan:
-            set_ik_command(phase_target[phase])
+            if not (args.prepose_to_ready and phase == "approach"):
+                set_ik_command(phase_target[phase])
             for k in range(n_steps):
                 rgb = read_rgb()
                 state = read_state_deg()
-                if phase in ("approach", "descend", "lift"):
-                    jclamped, hit, jdes = ik_solve_clamped()
-                    last_arm = jclamped
+                if args.prepose_to_ready and phase == "approach":
+                    frac = (k + 1) / max(1, n_steps)
+                    jraw = reset_arm + (ready_arm - reset_arm) * frac
+                elif phase in ("approach", "descend", "lift"):
+                    jraw, hit, jdes = ik_solve_clamped()
                     clamp_hit |= hit
                     # Refined clip: genuine commanded-action clipping, ignoring the
                     # unavoidable joint_4 zero-start lower-bound correction.
-                    clip_deg = torch.abs(jdes - jclamped) * 180.0 / math.pi  # [N,7]
+                    clip_deg = torch.abs(jdes - jraw) * 180.0 / math.pi  # [N,7]
                     j4 = clip_deg[:, joint4_idx]
                     clip_eff = clip_deg.clone()
                     clip_eff[:, joint4_idx] = torch.where(
@@ -580,7 +663,8 @@ def main() -> int:
                     refined_clip_hit |= step_max_clip > float(args.action_clip_tol_deg)
                     max_refined_clip_deg = torch.maximum(max_refined_clip_deg, step_max_clip)
                 else:  # close, hold -> hold last arm target
-                    jclamped = last_arm
+                    jraw = last_arm
+                jclamped = apply_arm_slew_limit(jraw)
                 gtarget_m = gripper_schedule(phase, k, n_steps)
                 gtarget_deg = sim_finger_m_to_gripper_deg(gtarget_m)
                 arm_deg = (jclamped * 180.0 / math.pi).detach().cpu().numpy()
@@ -666,6 +750,8 @@ def main() -> int:
                 "arm_side": side,
                 "image_size": image_size,
                 "episode_len": episode_len,
+                "prepose_to_ready": bool(args.prepose_to_ready),
+                "prepose_warmup_steps": int(args.prepose_warmup_steps) if args.prepose_to_ready else 0,
                 "object_poses_m": poses,
                 "object_rises_m": {name: round(float(rises[e, i]), 5) for i, name in enumerate(obj_names)},
                 "target_rise_m": round(float(target_rise[e]), 5),
@@ -685,6 +771,10 @@ def main() -> int:
                 "object_pushed_down": is_object_pushed_down,
                 "refined_action_clip": is_refined_clip,
                 "max_refined_action_clip_deg": round(float(max_refined_clip_deg[e]), 4),
+                "arm_action_step_limited": bool(arm_slew_limited_hit[e].item()),
+                "max_arm_action_delta_deg": round(float(max_arm_action_delta_deg[e]), 4),
+                "max_arm_raw_delta_deg": round(float(max_arm_raw_delta_deg[e]), 4),
+                "max_arm_action_step_limit_deg": round(float(args.max_arm_action_step_deg), 4),
                 "finger_body_names": list(finger_body_names),
                 "substeps": int(args.substeps),
                 "jitter_x_m": round(float(args.jitter_x_m), 5),
@@ -729,6 +819,8 @@ def main() -> int:
             dataset.save_episode()
             kept += 1
             kept_by_target[tname] += 1
+            if args.max_keep and kept >= args.max_keep:
+                break
 
         print(f"[dense] round {rnd+1}/{args.rounds}: source={source_total} kept={kept} "
               f"(round success={float(success.float().mean()):.3f})", file=sys.stderr, flush=True)
@@ -783,6 +875,8 @@ def main() -> int:
         "- `observation.state` is the measured joint state; `action` is the clamped IK command.",
         "- Frames are the real Isaac scene camera (not the placeholder renderer); they move across the episode.",
         "- Only successful, correct-object lifts are kept; wrong-object lifts, object collisions, gripper/table collisions, and object sweep/slide episodes are rejected.",
+        f"- Prepose-to-ready is `{bool(args.prepose_to_ready)}` with `{int(args.prepose_warmup_steps) if args.prepose_to_ready else 0}` non-recorded warmup steps.",
+        f"- Recorded arm command slew limit is `{float(args.max_arm_action_step_deg):.3f}` deg/control step (`0` disables it).",
         f"- Gripper close command is capped at `{effective_close_deg:.3f}` deg.",
         f"- Lift waypoint is `{float(args.lift_offset_m):.3f}` m above the grasp waypoint.",
         f"- Grasp z offset is `{float(args.grasp_z_offset_m):.3f}` m.",
@@ -800,6 +894,9 @@ def main() -> int:
         "object_pushed_down": object_pushed_down_total,
         "refined_action_clip": refined_clip_total,
         "grasp_close_deg": effective_close_deg,
+        "prepose_to_ready": bool(args.prepose_to_ready),
+        "prepose_warmup_steps": int(args.prepose_warmup_steps) if args.prepose_to_ready else 0,
+        "max_arm_action_step_deg": float(args.max_arm_action_step_deg),
         "grasp_z_offset_m": args.grasp_z_offset_m,
         "lift_offset_m": args.lift_offset_m,
         "image_size": image_size,

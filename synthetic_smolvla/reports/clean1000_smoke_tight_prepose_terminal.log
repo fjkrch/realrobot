@@ -1,0 +1,167 @@
+[3gH    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H    H   [INFO] Using python from: /home/chyanin/miniconda3/envs/env_isaaclab/bin/python
+[dense] episode_len=100 control steps, image=256px, keep-success-only, drop_limit=False, gripper_close=-3.000 deg, prepose_to_ready=True, prepose_warmup_steps=120
+[dense] launching Isaac (num_envs=8, cameras=on)
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /home/chyanin/IsaacLab/apps/isaaclab.python.headless.rendering.kit
+Loading user config located at: '/home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/chyanin/miniconda3/envs/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260619_133100.log
+2026-06-19T06:31:00Z [5ms] [Warning] [omni.ext.plugin] [ext: hsi_pregrasp_refusal] Extensions config 'extension.toml' doesn't exist '/home/chyanin/IsaacLab/source/hsi_pregrasp_refusal' or '/home/chyanin/IsaacLab/source/hsi_pregrasp_refusal/config'
+2026-06-19T06:31:00Z [504ms] [Warning] [gpu.foundation.plugin] Skipping unsupported non-NVIDIA GPU: AMD Radeon 780M Graphics (RADV PHOENIX)
+2026-06-19T06:31:00Z [504ms] [Warning] [gpu.foundation.plugin] Skipping unsupported non-NVIDIA GPU: AMD Radeon 780M Graphics (RADV PHOENIX)
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.159.03    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 4060 Laptop.. | Yes: 0 |     | 8188    MB | 10de      | 0          |
+|     |                                  |        |     |            | 28e0      | 78564eae.. |
+|     |                                  |        |     |            | 1         |            |
+|---------------------------------------------------------------------------------------------|
+| 1   | AMD Radeon 780M Graphics (RADV.. |        |     | 5396    MB | 1002      | 0          |
+|     |                                  |        |     |            | 15bf      | 00000000.. |
+|     |                                  |        |     |            | 6         |            |
+|=============================================================================================|
+| OS: 24.04.3 LTS (Noble Numbat) ubuntu, Version: 24.04.3, Kernel: 6.17.0-35-generic
+| XServer Vendor: The X.Org Foundation, XServer Version: 12101011 (1.21.1.11)
+| Processor: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+| Cores: 8 | Logical Cores: 16
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 15165 | Free Memory: 9846
+| Total Page/Swap (MB): 4095 | Free Page/Swap: 2401
+|---------------------------------------------------------------------------------------------|
+2026-06-19T06:31:01Z [823ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2026-06-19T06:31:01Z [823ms] [Warning] [gpu.foundation.plugin] Detected IOMMU is enabled. Running CUDA peer-to-peer bandwidth and latency validation.
+Unidirectional P2P=Enabled Bandwidth (P2P Writes) Matrix (GB/s)
+   D\D     0 
+     0 197.58 
+P2P=Enabled Latency (P2P Writes) Matrix (us)
+   GPU     0 
+     0   1.60 
+
+   CPU     0 
+     0   1.88 
+2026-06-19T06:31:02Z [1,651ms] [Warning] [omni.log] Source: omni.hydra was already registered.
+2026-06-19T06:31:02Z [1,975ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-06-19T06:31:02Z [1,988ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+2026-06-19T06:31:04Z [3,707ms] [Warning] [pxr.Semantics] pxr.Semantics is deprecated - please use Semantics instead
+2026-06-19T06:31:04Z [3,805ms] [Warning] [omni.graph.core.plugin] Found duplicate of category 'Replicator' - was 'Annotators', adding 'Fabric Reader'
+2026-06-19T06:31:04Z [3,805ms] [Warning] [omni.graph.core.plugin] Category 'Replicator' not accepted on node type 'omni.replicator.core.FabricReader' in extension 'omni.replicator.core'
+2026-06-19T06:31:04Z [3,806ms] [Warning] [omni.replicator.core.scripts.extension] No material configuration file, adding configuration to material settings directly.
+2026-06-19T06:31:07Z [6,857ms] [Warning] [omni.fabric.plugin] Warning: attribute viewPickingId not found for bucket id 7
+
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-06-19_13-31-07.log[0m
+[36m======================================================================================[0m
+
+[33m13:31:07 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[33m13:31:11 [articulation.py] WARNING: Not all actuators are configured! Total number of actuated joints not equal to number of joints available: 18 != 22.[0m
+2026-06-19T06:31:11Z [11,403ms] [Warning] [carb] Client omni.hydratexture.plugin has acquired [carb::settings::ISettings v1.0] 100 times. Consider accessing this interface with carb::getCachedInterface() (Performance warning)
+2026-06-19T06:31:11Z [11,416ms] [Warning] [carb] Client omni.hydratexture.plugin has acquired [carb::dictionary::IDictionary v1.1] 100 times. Consider accessing this interface with carb::getCachedInterface() (Performance warning)
+2026-06-19T06:31:11Z [11,567ms] [Warning] [omni.fabric.plugin] getAttributeCount called on non-existent path /World/envs/env_7/Robot/openarm_right_right_finger/visuals/openarm_right_right_finger_visual
+2026-06-19T06:31:11Z [11,567ms] [Warning] [omni.fabric.plugin] getTypes called on non-existent path /World/envs/env_7/Robot/openarm_right_right_finger/visuals/openarm_right_right_finger_visual
+2026-06-19T06:31:12Z [12,597ms] [Warning] [rtx.postprocessing.plugin] DLSS increasing input dimensions: Render resolution of (148, 148) is below minimal input resolution of 300.
+[dense] finger bodies for penetration check: ['openarm_left_right_finger', 'openarm_left_left_finger']
+[33m13:31:16 [video_utils.py] WARNING: 'torchcodec' is not available in your platform, falling back to 'pyav' as a default decoder[0m
+2026-06-19T06:31:18Z [18,228ms] [Warning] [carb] Client gpu.foundation.plugin has acquired [gpu::unstable::IMemoryBudgetManagerFactory v0.1] 100 times. Consider accessing this interface with carb::getCachedInterface() (Performance warning)
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1403.24 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1427.34 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1486.50 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1490.67 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1419.77 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1463.50 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1516.50 examples/s]
+[dense] round 1/8: source=8 kept=7 (round success=1.000)
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1484.90 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1439.45 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1443.04 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1477.61 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1463.19 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1401.07 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1439.39 examples/s]
+[dense] round 2/8: source=16 kept=14 (round success=1.000)
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1511.51 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1502.40 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1499.12 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1488.93 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1445.41 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1433.10 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1493.39 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1446.31 examples/s]
+[dense] round 3/8: source=24 kept=22 (round success=1.000)
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1490.40 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1498.68 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1480.12 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1415.67 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1502.39 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1486.19 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1434.86 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1490.78 examples/s]
+[dense] round 4/8: source=32 kept=30 (round success=1.000)
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1421.16 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1403.10 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1497.50 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1388.13 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1516.15 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1505.46 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1364.44 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1503.26 examples/s]
+[dense] round 5/8: source=40 kept=38 (round success=1.000)
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1522.93 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1500.30 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1487.05 examples/s]
+[dense] round 6/8: source=48 kept=41 (round success=1.000)
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1449.67 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1515.62 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1490.80 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1444.92 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1466.71 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1478.51 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1454.69 examples/s]
+[dense] round 7/8: source=56 kept=48 (round success=1.000)
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1493.60 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1461.09 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1520.36 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1417.26 examples/s]
+Map:   0%|          | 0/100 [00:00<?, ? examples/s]Map: 100%|██████████| 100/100 [00:00<00:00, 1465.50 examples/s]
+[dense] round 8/8: source=64 kept=53 (round success=1.000)
+{
+  "ok": true,
+  "source_episodes": 64,
+  "kept": 53,
+  "kept_rate": 0.828125,
+  "wrong_object": 0,
+  "limit_clamp": 0,
+  "object_collision": 4,
+  "gripper_table_collision": 0,
+  "object_sweep": 9,
+  "tabletop_penetration": 0,
+  "object_pushed_down": 0,
+  "refined_action_clip": 0,
+  "grasp_close_deg": -3.0,
+  "prepose_to_ready": true,
+  "prepose_warmup_steps": 120,
+  "grasp_z_offset_m": 0.0,
+  "lift_offset_m": 0.05,
+  "image_size": 256,
+  "episode_len": 100,
+  "dataset_root": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/datasets/clean1000_smoke_tight_prepose",
+  "repo_id": "local/clean1000_smoke_tight_prepose",
+  "manifest": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/clean1000_smoke_tight_prepose_manifest.jsonl",
+  "report": "/home/chyanin/Desktop/realrobot/synthetic_smolvla/reports/clean1000_smoke_tight_prepose_collect.md",
+  "kept_by_target": {
+    "green_cube": 20,
+    "blue_cube": 15,
+    "red_cube": 7,
+    "orange_ball": 11
+  },
+  "source_by_target": {
+    "green_cube": 20,
+    "blue_cube": 17,
+    "red_cube": 16,
+    "orange_ball": 11
+  }
+}

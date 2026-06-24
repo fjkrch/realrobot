@@ -17,7 +17,9 @@ Read this first if you are a new agent.
 3. [../reference/OPENARM_JOINT_LIMITS.md](../reference/OPENARM_JOINT_LIMITS.md)
 4. For the current VLA training state, read
    [SMOLVLA_TRAINING_HANDOFF.md](SMOLVLA_TRAINING_HANDOFF.md)
-5. Pick the task-specific folder:
+5. For the staged-init RGB+depth collection request, read
+   [OPENARM_DEPTH_STAGEDINIT_COLLECTION_HANDOFF.md](OPENARM_DEPTH_STAGEDINIT_COLLECTION_HANDOFF.md)
+6. Pick the task-specific folder:
    - [../sim/README.md](../sim/README.md)
    - [../real/README.md](../real/README.md)
    - [../troubleshooting/README.md](../troubleshooting/README.md)

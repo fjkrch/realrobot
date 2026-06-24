@@ -13,3 +13,15 @@ synthetic_smolvla/datasets/**/images/**/*.png
 synthetic_smolvla/datasets/**/images/**/*.jpg
 synthetic_smolvla/datasets/**/images/**/*.jpeg
 synthetic_smolvla/datasets/**/images/**/*.webp
+
+# Generated height-sweep configs/reports are noisy and reproducible.
+synthetic_smolvla/configs/_probe_*.yaml
+synthetic_smolvla/configs/generated_height_sweep*/
+synthetic_smolvla/reports/black_grey_real_arm_*/
+synthetic_smolvla/reports/default_isaaclab_g1_flat/
+synthetic_smolvla/reports/height_sweep*/
+synthetic_smolvla/reports/openarm_task_visual_preview/
+synthetic_smolvla/reports/photo_clean_reach_probe.json
+synthetic_smolvla/reports/photo_clean_v1_*/
+synthetic_smolvla/reports/real_photo_left_centered_clean_v1/
+synthetic_smolvla/reports/scene_preview_left_arm/

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Merge local LeRobot OpenArm datasets into one training root.
+"""Merge local OpenArm datasets into one training root.
 
 This keeps the existing dense dataset schema and rewrites episodes through the
-LeRobotDataset writer instead of editing parquet files directly.
+LeRobotDataset writer when LeRobot is installed. If the dense collector fell
+back to local NPZ episodes, this script renumbers and combines those episodes.
 """
 
 from __future__ import annotations
@@ -71,12 +72,86 @@ def _float32(value) -> np.ndarray:
     return array.astype(np.float32)
 
 
-def main() -> int:
-    args = build_arg_parser().parse_args()
+def _local_npz_inputs(input_roots: list[Path]) -> bool:
+    return bool(input_roots) and all((root / "episodes").is_dir() for root in input_roots)
 
-    from lerobot.datasets.lerobot_dataset import LeRobotDataset  # noqa: PLC0415
 
-    output_root = _resolve(args.output_root)
+def _merge_local_npz(args: argparse.Namespace, input_roots: list[Path], output_root: Path) -> dict[str, object]:
+    if output_root.exists():
+        if not args.overwrite:
+            raise SystemExit(f"Refusing to overwrite existing output root: {output_root}")
+        shutil.rmtree(output_root)
+    episodes_out = output_root / "episodes"
+    episodes_out.mkdir(parents=True, exist_ok=True)
+
+    counts: list[dict[str, object]] = []
+    total_episodes = 0
+    total_frames = 0
+    task_frame_counts: dict[str, int] = {}
+    task_episode_counts: dict[str, int] = {}
+    stop_requested = False
+
+    for input_root in input_roots:
+        if stop_requested:
+            break
+        episode_files = sorted((input_root / "episodes").glob("episode_*.npz"))
+        source_episodes = 0
+        source_frames = 0
+        for episode_file in episode_files:
+            if args.max_total_episodes is not None and total_episodes >= args.max_total_episodes:
+                stop_requested = True
+                break
+            with np.load(episode_file) as episode:
+                frames = int(episode[CAMERA_KEY if CAMERA_KEY in episode.files else "camera"].shape[0])
+                task_array = episode["task"] if "task" in episode.files else np.asarray("")
+                task = str(task_array.item() if hasattr(task_array, "item") else task_array)
+            shutil.copy2(episode_file, episodes_out / f"episode_{total_episodes:06d}.npz")
+            source_episodes += 1
+            source_frames += frames
+            total_episodes += 1
+            total_frames += frames
+            task_frame_counts[task] = task_frame_counts.get(task, 0) + frames
+            task_episode_counts[task] = task_episode_counts.get(task, 0) + 1
+        counts.append(
+            {
+                "root": str(input_root),
+                "frames": source_frames,
+                "episodes": source_episodes,
+                "episode_files_found": len(episode_files),
+                "repo_id": _repo_id_for(input_root),
+                "backend": "local_npz",
+            }
+        )
+
+    metadata = {
+        "ok": True,
+        "backend": "local_npz",
+        "repo_id": args.repo_id,
+        "fps": int(args.fps),
+        "robot_type": "openarm_synthetic_isaac_dense",
+        "num_episodes": total_episodes,
+        "num_frames": total_frames,
+        "inputs": counts,
+        "format": "episodes/episode_000000.npz with arrays camera,state,action,task",
+    }
+    (output_root / "meta.json").write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    return {
+        "ok": True,
+        "backend": "local_npz",
+        "output_root": str(output_root),
+        "repo_id": args.repo_id,
+        "inputs": counts,
+        "max_total_episodes": args.max_total_episodes,
+        "stopped_at_episode_cap": stop_requested,
+        "total_frames": total_frames,
+        "total_episodes": total_episodes,
+        "task_frame_counts": task_frame_counts,
+        "task_episode_counts": task_episode_counts,
+    }
+
+
+def _merge_lerobot(args: argparse.Namespace, input_roots: list[Path], output_root: Path, LeRobotDataset) -> dict[str, object]:
     if output_root.exists():
         if not args.overwrite:
             raise SystemExit(f"Refusing to overwrite existing output root: {output_root}")
@@ -104,10 +179,9 @@ def main() -> int:
     task_counts: dict[str, int] = {}
     stop_requested = False
 
-    for input_root_text in args.input:
+    for input_root in input_roots:
         if stop_requested:
             break
-        input_root = _resolve(input_root_text)
         source = LeRobotDataset(_repo_id_for(input_root), root=input_root)
         current_episode = None
         source_episodes = 0
@@ -155,8 +229,9 @@ def main() -> int:
 
     merged.finalize()
 
-    report = {
+    return {
         "ok": True,
+        "backend": "lerobot",
         "output_root": str(output_root),
         "repo_id": args.repo_id,
         "inputs": counts,
@@ -166,6 +241,33 @@ def main() -> int:
         "total_episodes": total_episodes,
         "task_frame_counts": task_counts,
     }
+
+
+def main() -> int:
+    args = build_arg_parser().parse_args()
+    output_root = _resolve(args.output_root)
+    input_roots = [_resolve(input_root_text) for input_root_text in args.input]
+
+    use_local_npz = _local_npz_inputs(input_roots)
+    LeRobotDataset = None
+    if not use_local_npz:
+        try:
+            from lerobot.datasets.lerobot_dataset import LeRobotDataset as _LeRobotDataset  # noqa: PLC0415
+
+            LeRobotDataset = _LeRobotDataset
+        except ModuleNotFoundError as exc:
+            if exc.name != "lerobot":
+                raise
+            raise SystemExit(
+                "LeRobot is not installed and the inputs are not local NPZ datasets "
+                "(missing episodes/ directories)."
+            ) from exc
+
+    if use_local_npz:
+        report = _merge_local_npz(args, input_roots, output_root)
+    else:
+        report = _merge_lerobot(args, input_roots, output_root, LeRobotDataset)
+
     report_path = _resolve(args.report)
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")

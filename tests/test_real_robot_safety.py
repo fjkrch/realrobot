@@ -18,6 +18,7 @@ REAL_MOTION_ENTRYPOINTS = [
     ("scripts/move_joint.py", "main"),
     ("scripts/move_arm.py", "main"),
     ("scripts/pick_cube.py", "run_real"),
+    ("scripts/replay_openarm_saved_episode_real.py", "main"),
 ]
 
 REAL_CONFIRM_ENTRYPOINTS = [
@@ -69,12 +70,36 @@ def _first_real_confirm_guard_line(node: ast.AST) -> int | None:
     return min(lines) if lines else None
 
 
+def _first_confirm_real_hardware_guard_line(node: ast.AST) -> int | None:
+    lines = []
+    for child in ast.walk(node):
+        if isinstance(child, ast.If):
+            test = ast.unparse(child.test)
+            if "args.confirm_real_hardware" in test and ("not " in test or " is False" in test):
+                lines.append(child.lineno)
+        if (
+            isinstance(child, ast.Call)
+            and isinstance(child.func, ast.Name)
+            and child.func.id == "validate_real_flags"
+        ):
+            lines.append(child.lineno)
+    return min(lines) if lines else None
+
+
 def test_real_motion_scripts_require_operator_acknowledgement_flag() -> None:
     for relative_path, _entrypoint in REAL_MOTION_ENTRYPOINTS + REAL_CONFIRM_ENTRYPOINTS:
         text = _source(relative_path)
 
-        assert "--i-am-at-robot" in text or "--real-confirm" in text, relative_path
-        assert "args.i_am_at_robot" in text or "args.real_confirm" in text, relative_path
+        assert (
+            "--i-am-at-robot" in text
+            or "--real-confirm" in text
+            or "--confirm-real-hardware" in text
+        ), relative_path
+        assert (
+            "args.i_am_at_robot" in text
+            or "args.real_confirm" in text
+            or "args.confirm_real_hardware" in text
+        ), relative_path
         assert "Refusing" in text, relative_path
 
 
@@ -83,7 +108,11 @@ def test_real_motion_paths_check_acknowledgement_before_can_access() -> None:
         tree = ast.parse(_source(relative_path), filename=relative_path)
         function = _function(tree, entrypoint)
 
-        guard_line = _first_i_am_at_robot_guard_line(function) or _first_real_confirm_guard_line(function)
+        guard_line = (
+            _first_i_am_at_robot_guard_line(function)
+            or _first_real_confirm_guard_line(function)
+            or _first_confirm_real_hardware_guard_line(function)
+        )
         can_line = _first_call_line(function, "require_can_interface")
 
         assert guard_line is not None, f"{relative_path}:{entrypoint} missing operator confirmation guard"

@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Saved upsampled OpenArm episode replay launcher.
+#
+# Default is dry-run. Real hardware movement requires:
+#   REAL=1 CONFIRM_HEIGHT=1 bash run_openarm_saved_episode_replay.txt
+#
+# Knobs:
+#   HEIGHT=125|122.5|120|117.5|115|112.5|110|107.5|105|102.25|100
+#   DATASET_FAMILY=auto|10hz|20hz400
+#   SIDE=left|right
+#   PORT=can1|can0
+#   RATE_HZ=10.0|20.0  (omit to use the dataset-family default)
+#   DATASET_ROOT=/path/to/dataset-family-root  (omit to use the built-in root)
+#   DRY_RUN_NO_SLEEP=1
+#   YES=1
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+HEIGHT="${HEIGHT:-125}"
+DATASET_FAMILY="${DATASET_FAMILY:-auto}"
+SIDE="${SIDE:-left}"
+RATE_HZ="${RATE_HZ:-}"
+REAL="${REAL:-0}"
+CONFIRM_HEIGHT="${CONFIRM_HEIGHT:-0}"
+DRY_RUN_NO_SLEEP="${DRY_RUN_NO_SLEEP:-0}"
+YES="${YES:-0}"
+DATASET_ROOT="${DATASET_ROOT:-}"
+
+if [ "${SIDE}" = "right" ]; then
+  DEFAULT_PORT="can0"
+else
+  DEFAULT_PORT="can1"
+fi
+PORT="${PORT:-${DEFAULT_PORT}}"
+
+cmd=(
+  python
+  "${repo_root}/scripts/replay_openarm_saved_episode_real.py"
+  --height "${HEIGHT}"
+  --dataset-family "${DATASET_FAMILY}"
+  --side "${SIDE}"
+  --port "${PORT}"
+)
+
+if [ -n "${DATASET_ROOT}" ]; then
+  cmd+=(--dataset-root "${DATASET_ROOT}")
+fi
+
+if [ -n "${RATE_HZ}" ]; then
+  cmd+=(--rate-hz "${RATE_HZ}")
+fi
+
+if [ "${REAL}" = "1" ]; then
+  if [ "${CONFIRM_HEIGHT}" != "1" ]; then
+    echo "Refusing real replay: set CONFIRM_HEIGHT=1 after setting the robot/table to HEIGHT=${HEIGHT}." >&2
+    exit 2
+  fi
+  cmd+=(--no-dry-run --confirm-real-hardware --confirm-height)
+else
+  if [ "${DRY_RUN_NO_SLEEP}" = "1" ]; then
+    cmd+=(--dry-run-no-sleep)
+  fi
+fi
+
+if [ "${YES}" = "1" ]; then
+  cmd+=(--yes)
+fi
+
+printf '[saved-episode-replay] exec:'
+printf ' %q' "${cmd[@]}"
+printf '\n'
+exec "${cmd[@]}"

@@ -56,6 +56,7 @@ driven from the Jetson at `/home/arms/hsi-pre-grasp`.
 |---|---|---|
 | [scripts/openarm_default_pose_live_server.py](scripts/openarm_default_pose_live_server.py) | Laptop | Always-open clean Isaac mirror. |
 | [run_default_openarm_mirror.txt](run_default_openarm_mirror.txt) | Laptop | Launcher for the clean Isaac mirror. |
+| [run_openarm_saved_episode_replay.txt](run_openarm_saved_episode_replay.txt) | Jetson | Launcher for saved upsampled height episode replay; dry-run by default. |
 | [scripts/isaaclab_python.sh](scripts/isaaclab_python.sh) | Laptop | Short wrapper for `conda run -n env_isaaclab ./isaaclab.sh -p ...`. |
 | [scripts/install_isaaclab_shortcuts.sh](scripts/install_isaaclab_shortcuts.sh) | Laptop | Installs `~/IsaacLab` shortcuts for the wrapper and mirror launcher. |
 | [scripts/jetson_isaaclab_command.py](scripts/jetson_isaaclab_command.py) | Jetson | Sends sim-only commands to laptop. |

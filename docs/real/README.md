@@ -30,6 +30,8 @@ paste credential content into chat or commits.
 | One joint | [../../scripts/move_joint.py](../../scripts/move_joint.py) | [REAL_ROBOT_MOVE.md](REAL_ROBOT_MOVE.md) |
 | All 7 joints of one arm | [../../scripts/move_arm.py](../../scripts/move_arm.py) | [REAL_ROBOT_MOVE.md](REAL_ROBOT_MOVE.md) |
 | Guarded SmolVLA Isaac mirror | [../../scripts/openarm_safe_real_mirror.py](../../scripts/openarm_safe_real_mirror.py) | [SMOLVLA_SIM_TO_REAL_MIRROR.md](SMOLVLA_SIM_TO_REAL_MIRROR.md) |
+| Saved upsampled height episode replay | [../../scripts/replay_openarm_saved_episode_real.py](../../scripts/replay_openarm_saved_episode_real.py) | This README |
+| Saved episode replay launcher | [../../run_openarm_saved_episode_replay.txt](../../run_openarm_saved_episode_replay.txt) | This README |
 | Teach / replay cube pick | [../../scripts/pick_cube.py](../../scripts/pick_cube.py) | [PICK_CUBE_SIM_TO_REAL.md](PICK_CUBE_SIM_TO_REAL.md) |
 | Release torque | Jetson-side `scripts/disable_torque.py` | [REAL_ROBOT_MOVE.md](REAL_ROBOT_MOVE.md) |
 
@@ -51,6 +53,78 @@ sudo ./scripts/can_up.sh
 ```
 
 Then follow [REAL_ROBOT_MOVE.md](REAL_ROBOT_MOVE.md).
+
+## Saved Height Episode Replay
+
+This replays saved upsampled NPZ episodes for one selected table height. It
+reads only the `action` key, refuses non-upsampled paths, refuses commands
+outside real joint limits, and sends exactly one saved command at the dataset
+rate. The original `10hz` family uses `2 deg/command` at `0.1 s`; the lower
+`20hz400` family uses `1.5 deg/command` at `0.05 s`.
+
+The first saved command is zero pose. The runner does not move the robot to
+zero; the operator must place the real arm close to the first saved command.
+If the live readback is not close, real replay is refused.
+
+Deploy the runner and only the upsampled height folders to the Jetson:
+
+```bash
+cd /home/chyanin/Desktop/realrobot
+JETSON=arms@192.168.31.50
+
+ssh "$JETSON" 'mkdir -p /home/arms/hsi-pre-grasp/synthetic_smolvla/datasets/openarm_photo_clean_v1_one_per_height'
+scp scripts/replay_openarm_saved_episode_real.py "$JETSON":/home/arms/hsi-pre-grasp/scripts/
+scp run_openarm_saved_episode_replay.txt "$JETSON":/home/arms/hsi-pre-grasp/
+ssh "$JETSON" 'mkdir -p /home/arms/hsi-pre-grasp/docs/real'
+scp docs/real/run_openarm_saved_episode_replay.txt "$JETSON":/home/arms/hsi-pre-grasp/docs/real/
+scp -r \
+  synthetic_smolvla/datasets/openarm_photo_clean_v1_one_per_height/h125cm_upsampled \
+  synthetic_smolvla/datasets/openarm_photo_clean_v1_one_per_height/h122p5cm_upsampled \
+  synthetic_smolvla/datasets/openarm_photo_clean_v1_one_per_height/h120cm_upsampled \
+  synthetic_smolvla/datasets/openarm_photo_clean_v1_one_per_height/h117p5cm_upsampled \
+  synthetic_smolvla/datasets/openarm_photo_clean_v1_one_per_height/h115cm_upsampled \
+  "$JETSON":/home/arms/hsi-pre-grasp/synthetic_smolvla/datasets/openarm_photo_clean_v1_one_per_height/
+
+ssh "$JETSON" 'mkdir -p /home/arms/hsi-pre-grasp/synthetic_smolvla/datasets/openarm_photo_clean_v1_one_per_height_20hz400'
+scp -r \
+  synthetic_smolvla/datasets/openarm_photo_clean_v1_one_per_height_20hz400/h112p5cm_upsampled \
+  synthetic_smolvla/datasets/openarm_photo_clean_v1_one_per_height_20hz400/h110cm_upsampled \
+  synthetic_smolvla/datasets/openarm_photo_clean_v1_one_per_height_20hz400/h107p5cm_upsampled \
+  "$JETSON":/home/arms/hsi-pre-grasp/synthetic_smolvla/datasets/openarm_photo_clean_v1_one_per_height_20hz400/
+```
+
+Dry-run on the Jetson first. This does not touch CAN or motors:
+
+```bash
+cd /home/arms/hsi-pre-grasp
+source .venv/bin/activate
+HEIGHT=125 DRY_RUN_NO_SLEEP=1 bash run_openarm_saved_episode_replay.txt
+```
+
+Real replay requires the operator at the robot, e-stop ready, the selected table
+height set, CAN up, and both explicit confirmation flags. Real mode refuses a
+rate that does not match the selected dataset family, so the wall-clock command
+period stays exactly like the Isaac replay:
+
+```bash
+cd /home/arms/hsi-pre-grasp
+source .venv/bin/activate
+sudo ./scripts/can_up.sh
+
+HEIGHT=125 REAL=1 CONFIRM_HEIGHT=1 bash run_openarm_saved_episode_replay.txt
+```
+
+Supported `10hz` heights are `125`, `122.5`, `120`, `117.5`, and `115`.
+Supported `20hz400` heights currently present are `112.5`, `110`, and `107.5`.
+
+Examples:
+
+```bash
+HEIGHT=122.5 DRY_RUN_NO_SLEEP=1 bash run_openarm_saved_episode_replay.txt
+HEIGHT=122.5 REAL=1 CONFIRM_HEIGHT=1 bash run_openarm_saved_episode_replay.txt
+HEIGHT=112.5 DRY_RUN_NO_SLEEP=1 bash run_openarm_saved_episode_replay.txt
+HEIGHT=112.5 REAL=1 CONFIRM_HEIGHT=1 bash run_openarm_saved_episode_replay.txt
+```
 
 ## Guarded SmolVLA Mirror
 

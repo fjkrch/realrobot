@@ -7,7 +7,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-import yaml
+try:
+    import yaml
+except ModuleNotFoundError:  # pragma: no cover - exercised only in minimal shells
+    yaml = None
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -131,6 +134,8 @@ def sim_finger_m_to_gripper_deg(finger_m: float) -> float:
 
 
 def load_yaml_config(path: str | Path) -> dict[str, Any]:
+    if yaml is None:
+        raise RuntimeError("PyYAML is required to load scene configs in this environment.")
     resolved = Path(path)
     if not resolved.is_absolute():
         resolved = REPO_ROOT / resolved

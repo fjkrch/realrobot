@@ -1,0 +1,162 @@
+scene:
+  name: openarm_real_photo_left_centered_clean_v1
+  sim_only: true
+  openarm_setup: bimanual
+  active_arm: left
+  # Clean simulation-only scene matched to the user's robot-view photo.
+  # The left arm is centered on a compact object row, preserving the visible
+  # photo order: orange at the left edge, then red, green on tape, blue right.
+  # Left init pose is a real folded ready pose inside the safe joint limits, so
+  # the contract validator is enforced (no out-of-contract reset pose needed).
+  allow_out_of_contract_reset_pose: false
+  layout_info_cm:
+    table_height: 73.0
+    table_edge_width: 150.0
+    robot_plus_table_height: 125.0
+    robot_base_width: 43.0
+    table_to_robot_gap: 20.0
+    total_horizontal_space: 223.0
+    fallback_root_offset_reason: "USD root calibrated for reachable sim-only tabletop training"
+    left_arm_centered_base_y_m: 0.08
+    object_spacing_y_m: 0.065
+  table:
+    prim_path: /World/Table
+    size_m: [1.50, 1.50, 0.04]
+    pose_m: [1.265, 0.0, 0.71]
+    color_rgb: [0.60, 0.46, 0.30]
+  appearance:
+    lighting:
+      intensity: 1150.0
+      color: [0.86, 0.83, 0.76]
+    robot_material:
+      enabled: true
+      palette: black_grey_real_arm
+      color_rgb: [0.78, 0.78, 0.75]
+      roughness: 0.50
+      metallic: 0.0
+      # Only the LEFT arm is active for this task; hide the inactive right arm's
+      # visuals so the robot-view preview and dataset frames show the left arm only.
+      hide_inactive_arm: true
+    floor:
+      enabled: true
+      size_m: [5.0, 4.0, 0.02]
+      pose_m: [1.35, 0.0, -0.008]
+      color_rgb: [0.50, 0.50, 0.49]
+      roughness: 0.98
+      speckles:
+        count: 0
+    table_rim:
+      enabled: true
+      sides: [front]
+      thickness_m: 0.035
+      height_m: 0.045
+      color_rgb: [0.014, 0.014, 0.017]
+      roughness: 0.82
+    table_markers:
+      - name: center_tape_area
+        size_m: [0.42, 0.115, 0.004]
+        pose_m: [0.72, 0.233, 0.733]
+        color_rgb: [0.80, 0.76, 0.64]
+        roughness: 0.92
+      - name: tape_highlight_left
+        size_m: [0.34, 0.010, 0.005]
+        pose_m: [0.71, 0.196, 0.736]
+        color_rgb: [0.92, 0.90, 0.82]
+        roughness: 0.88
+      - name: tape_highlight_right
+        size_m: [0.34, 0.010, 0.005]
+        pose_m: [0.71, 0.270, 0.736]
+        color_rgb: [0.92, 0.90, 0.82]
+        roughness: 0.88
+      - name: front_handle
+        size_m: [0.050, 0.190, 0.008]
+        pose_m: [0.535, 0.233, 0.738]
+        color_rgb: [0.015, 0.015, 0.018]
+        roughness: 0.72
+      - name: back_dark_strip
+        size_m: [0.055, 1.44, 0.006]
+        pose_m: [1.02, 0.0, 0.735]
+        color_rgb: [0.030, 0.028, 0.026]
+        roughness: 0.80
+    wall:
+      enabled: true
+      size_m: [0.04, 4.0, 1.75]
+      pose_m: [2.42, 0.0, 0.875]
+      color_rgb: [0.80, 0.80, 0.76]
+      roughness: 0.90
+    baseboard:
+      enabled: true
+      size_m: [0.055, 4.0, 0.12]
+      pose_m: [2.385, 0.0, 0.060]
+      color_rgb: [0.040, 0.038, 0.036]
+      roughness: 0.82
+  camera:
+    prim_path: /World/RobotViewCamera
+    camera_model: Intel RealSense D435i RGB
+    resolution: [640, 360]
+    eye_m: [0.43, 0.233, 1.07]
+    target_m: [0.68, 0.233, 0.722]
+    horizontal_fov_deg: 69.4
+    vertical_fov_deg: 42.5
+    horizontal_aperture_mm: 20.955
+    focal_length_mm: 15.131432
+  workspace_bounds_m:
+    x: [0.50, 2.02]
+    y: [-0.75, 0.75]
+    z: [0.72, 0.79]
+
+robot:
+  base_pose_m: [0.38, 0.08, 0.60]
+  reset_pose_deg:
+    right:
+      joint_1: 0.0
+      joint_2: 0.0
+      joint_3: 0.0
+      joint_4: 0.0
+      joint_5: 0.0
+      joint_6: 0.0
+      joint_7: 0.0
+      gripper: 0.0
+    left:
+      # Collision-free CENTRAL pre-grasp init pose for the LEFT arm. Derived by
+      # IK to a point ~12 cm above the centre of the object row, then averaged
+      # across all four objects and clamped to the safe joint limits (j6 -> 37).
+      # The TCP hovers ~0.875 m (table top is 0.73 m), arm extended over the
+      # table but clear of it and the objects, fingers OPEN (-65 deg). From here
+      # the recorded approach reaches any object's above-pose in <=4 commands at
+      # the 2 deg/command cap, so the slew limit no longer starves the grasp.
+      # Reach verified for all four objects (probe_photo_clean_reach.py).
+      joint_1: 21.13
+      joint_2: 4.85
+      joint_3: -1.32
+      joint_4: 47.8
+      joint_5: 11.84
+      joint_6: 37.0
+      joint_7: -45.88
+      gripper: -65.0
+
+objects:
+  - name: orange_ball
+    instruction: pick up the orange ball
+    shape: sphere
+    color_rgb: [1.0, 0.45, 0.02]
+    radius_m: 0.020
+    spawn_pose_m: [0.58, 0.363, 0.75]
+  - name: red_cube
+    instruction: pick up the red cube
+    shape: cube
+    color_rgb: [0.9, 0.03, 0.03]
+    size_m: [0.0254, 0.0254, 0.0254]
+    spawn_pose_m: [0.58, 0.298, 0.745]
+  - name: green_cube
+    instruction: pick up the green cube
+    shape: cube
+    color_rgb: [0.05, 0.70, 0.12]
+    size_m: [0.0254, 0.0254, 0.0254]
+    spawn_pose_m: [0.58, 0.233, 0.745]
+  - name: blue_cube
+    instruction: pick up the blue cube
+    shape: cube
+    color_rgb: [0.04, 0.20, 0.95]
+    size_m: [0.0254, 0.0254, 0.0254]
+    spawn_pose_m: [0.58, 0.168, 0.745]
